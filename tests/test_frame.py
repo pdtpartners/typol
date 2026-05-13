@@ -1,0 +1,322 @@
+from collections.abc import Callable, Iterable
+from enum import Enum
+from typing import TYPE_CHECKING, Final
+
+import pytest
+
+import typol as tp
+from typol.types import EnumOf
+
+if TYPE_CHECKING:
+    from ty_extensions import Intersection, TypeOf, is_assignable_to, static_assert
+
+type _Frame[S: tp.Shape] = type[tp.DataFrame[S] | tp.LazyFrame[S]]
+
+data_and_lazy = pytest.mark.parametrize(["cls"], [[tp.DataFrame], [tp.LazyFrame]])
+
+
+class Person(tp.Shape):
+    name = tp.dimension(str)
+    age = tp.dimension(int)
+
+
+_PEOPLE: Final = (
+    tp.Entry.of(Person.name.set("Douglas"), Person.age.set(42)),
+    tp.Entry.of(Person.name.set("William"), Person.age.set(80)),
+)
+
+
+@data_and_lazy
+def test_construct_from_entries[F: _Frame](cls: F) -> None:
+    frame = cls(Person, _PEOPLE)
+    assert frame.collect().to_dicts() == [
+        {"name": "Douglas", "age": 42},
+        {"name": "William", "age": 80},
+    ]
+
+
+@data_and_lazy
+def test_with_columns[F: _Frame](cls: F) -> None:
+    frame = cls(Person, _PEOPLE)
+    assert frame.with_columns(
+        Person.age - 20, Person.name + " Adams"
+    ).collect().to_dicts() == [
+        {"name": "Douglas Adams", "age": 22},
+        {"name": "William Adams", "age": 60},
+    ]
+
+
+class Account(tp.Shape):
+    username = tp.dimension(str)
+    email = tp.dimension(str)
+
+
+@data_and_lazy
+def test_transform[F: _Frame](cls: F) -> None:
+    frame = cls(Person, _PEOPLE)
+    accounts = frame.transform(
+        a := Account,
+        frame.s.name.str.to_lowercase().to(a.username),
+        (frame.s.name.str.to_lowercase() + "@example.net").to(a.email),
+    )
+    assert accounts.collect().to_dicts() == [
+        {"username": "douglas", "email": "douglas@example.net"},
+        {"username": "william", "email": "william@example.net"},
+    ]
+
+
+_ACCOUNTS: Final = (
+    tp.Entry.of(
+        Account.username.set("douglas"), Account.email.set("douglas@adams.net")
+    ),
+    tp.Entry.of(
+        Account.username.set("will"), Account.email.set("will@wilberforce.net")
+    ),
+)
+
+
+def test_join_df() -> None:
+    people = tp.DataFrame(Person, _PEOPLE)
+    accounts = tp.DataFrame(Account, _ACCOUNTS)
+    lowered_name = Person.name.str.to_lowercase()
+    left = people.join(accounts, lowered_name.on(Account.username), how="left")
+    right = people.join(accounts, lowered_name.on(Account.username), how="right")
+    inner = people.join(accounts, lowered_name.on(Account.username), how="inner")
+    outer = people.join(accounts, lowered_name.on(Account.username), how="outer")
+    assert left.sort(Person.name).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {"name": "William", "age": 80, "username": None, "email": None},
+    ]
+    assert right.sort(right.s.username).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+    assert inner.to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        }
+    ]
+    assert outer.sort(Person.name, Account.username, nulls_last=True).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {"name": "William", "age": 80, "username": None, "email": None},
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+
+
+def test_join_lf() -> None:
+    people = tp.LazyFrame(Person, _PEOPLE)
+    accounts = tp.LazyFrame(Account, _ACCOUNTS)
+    lowered_name = Person.name.str.to_lowercase()
+    left = people.join(accounts, lowered_name.on(Account.username), how="left")
+    right = people.join(accounts, lowered_name.on(Account.username), how="right")
+    inner = people.join(accounts, lowered_name.on(Account.username), how="inner")
+    outer = people.join(accounts, lowered_name.on(Account.username), how="outer")
+    assert left.sort(Person.name).collect().to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {"name": "William", "age": 80, "username": None, "email": None},
+    ]
+
+    assert right.sort(right.s.username).collect().to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+    assert inner.collect().to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        }
+    ]
+    assert outer.sort(
+        Person.name, Account.username, nulls_last=True
+    ).collect().to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {"name": "William", "age": 80, "username": None, "email": None},
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+
+
+def test_transform_suffixed_self_join_transform_lf() -> None:
+    """
+    Test a self-join (on the same shape) sandwiched by transforms, to make sure suffixing works and
+    transforms on the resultant shapes are typed well
+    """
+    people = tp.LazyFrame(Person, _PEOPLE)
+    accounts = tp.LazyFrame(Account, _ACCOUNTS)
+    generated_accounts = people.transform(
+        a := Account,
+        people.s.name.str.to_lowercase().to(a.username),
+        (people.s.name.str.to_lowercase() + "@example.net").to(a.email),
+    ).suffix()
+    joined = accounts.join(
+        generated_accounts,
+        accounts.s.username.on(generated_accounts.s(a.username)),
+        how="outer",
+    ).with_columns(accounts.s.username.coalesce(generated_accounts.s(a.username)))
+    combined_emails = (
+        tp.concat_list((a.email, generated_accounts.s(a.email)))
+        .list.drop_nulls()
+        .list.join(",")
+    )
+    if TYPE_CHECKING:
+        static_assert(
+            is_assignable_to(
+                TypeOf[combined_emails],
+                tp.MesoExpr[Intersection[Account, tp.Suffixed[Account]], str],
+            )
+        )
+
+    transformed = joined.transform(a := Account, combined_emails.to(a.email))
+    assert transformed.sort(a.username).collect().to_dicts() == [
+        {"username": "douglas", "email": "douglas@adams.net,douglas@example.net"},
+        {"username": "will", "email": "will@wilberforce.net"},
+        {"username": "william", "email": "william@example.net"},
+    ]
+
+
+class Suit(Enum):
+    HEARTS = "hearts"
+    CLUBS = "clubs"
+    SPADES = "spades"
+    DIAMONDS = "diamonds"
+
+
+class Card(tp.Shape):
+    number = tp.dimension(tp.UINT_8)
+    suit = tp.dimension(Suit)
+
+
+def test_str_enum() -> None:
+    if TYPE_CHECKING:
+        static_assert(
+            is_assignable_to(tp.BoundDimension[Card, Suit], TypeOf[Card.suit])
+        )
+        static_assert(
+            is_assignable_to(
+                TypeOf[Card.suit.set], Callable[[Suit], tp.expr.Initializer[Card, Suit]]
+            )
+        )
+
+    cards = tp.DataFrame(
+        Card,
+        (
+            tp.Entry.of(Card.number.set(10), Card.suit.set(Suit.HEARTS)),
+            tp.Entry.of(Card.number.set(2), Card.suit.set(Suit.CLUBS)),
+        ),
+    )
+
+    if TYPE_CHECKING:
+        static_assert(is_assignable_to(TypeOf[cards[Card.suit]], tp.Series[Suit]))
+        static_assert(is_assignable_to(TypeOf[cards[Card.suit].to_list()], list[str]))
+
+    assert cards[Card.suit].to_list() == ["hearts", "clubs"]
+
+    row = next(cards.iter_rows())
+    if TYPE_CHECKING:
+        static_assert(is_assignable_to(TypeOf[row[Card.suit]], str))
+    assert row[Card.suit] == "hearts"
+
+
+class Result(Enum):
+    GOLD = 1
+    SILVER = 2
+    BRONZE = 3
+
+
+class Player(tp.Shape):
+    name = tp.dimension(str)
+    result = tp.dimension(Result)
+
+
+def test_int_enum() -> None:
+    if TYPE_CHECKING:
+        static_assert(
+            is_assignable_to(tp.BoundDimension[Player, Result], TypeOf[Player.result])
+        )
+        static_assert(
+            is_assignable_to(
+                TypeOf[Player.result.set],
+                Callable[[Result], tp.expr.Initializer[Player, Result]],
+            )
+        )
+
+    players = tp.DataFrame(
+        Player,
+        (
+            tp.Entry.of(Player.name.set("Marry Oh"), Player.result.set(Result.BRONZE)),
+            tp.Entry.of(Player.name.set("Louisie"), Player.result.set(Result.SILVER)),
+        ),
+    )
+
+    if TYPE_CHECKING:
+        static_assert(
+            is_assignable_to(TypeOf[players[Player.result]], tp.Series[Result])
+        )
+        static_assert(
+            is_assignable_to(TypeOf[players[Player.result]], Iterable[EnumOf[int]])
+        )
+        static_assert(
+            is_assignable_to(TypeOf[players[Player.result].to_list()], list[int])
+        )
+        static_assert(
+            is_assignable_to(TypeOf[players[Player.result].first()], int | None)
+        )
+
+    assert players[Player.result].to_list() == [3, 2]
+
+    row = next(players.iter_rows())
+    assert row[Player.result] == 3

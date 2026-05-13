@@ -1,0 +1,110 @@
+
+[project]
+name = "typol"
+version = "0.0.1"
+requires-python = ">=3.12"
+dependencies = [
+    "more-itertools>=11.0.2",
+    "polars>=1.40.1",
+    "pytest>=9.0.3",
+    "ruff>=0.15.12",
+    "ty>=0.0.35",
+]
+
+[tool.pytest.ini_options]
+addopts = "--log-level=INFO -vvv"
+testpaths = ["tests"]
+filterwarnings = "ignore"
+
+[tool.ty.rules]
+unused-ignore-comment = "error"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+src = ["."]
+
+# Enable explicit preview rules if we want to opt-in to them
+lint.preview = true
+lint.explicit-preview-rules = true
+
+lint.select = [
+    "ANN",
+    "B",
+    "C4",
+    "D",     # pydocstyle, configured with convention = "numpy" below
+    "E",
+    "F",
+    "FA",
+    "FBT003",
+    "FURB",
+    "G",
+    "I",
+    "ICN",
+    "LOG",
+    "N",
+    "PERF",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "PTH",
+    "PYI",
+    "RSE",
+    "RUF",
+    "SIM",
+    "T10",
+    "UP",
+    "ISC004",  # implicit-string-concatenation-in-collection-literal, these are particularly bad since newlines can look like different collection elements
+    "RET501",  # unnecessary-return-none, just use `return` if only `None` is possible (void functions), note other RET rules can conflict with mypy unreachability
+    "RET502",  # implicit-return-value, use `return None` if other return values are possible (non-void functions)
+    "RET504",  # unnecessary-assign, don't do `x = f(...); return x`, just do `return f(...)`
+    "TD002",   # missing-todo-author (strict only), make it easy to find things you forgot to do
+    "TID251",  # banned-api, allows us to declare banned imports below
+    "TID253",  # banned-module-level-imports (strict only), imports only banned at top level in new code to force transition
+    "W605",    # invalid-escape-sequence, use raw strings or \\
+]
+# Resetting select seems to reset ignore
+lint.ignore = [
+    "B905",   # zip-without-explicit-strict, these are often useful, e.g. zip(items, items[1:])
+    "E741",   # ambiguous-variable-name
+    "E501",   # line-too-long, rely on ruff to format these
+    "PYI025", # unaliased-collections-abc-set-import, we haven't used `Set` for `set`, this rule seems to be for more legacy users, and just causes us to use an old name `AbstractSet` (and not `AbstractMapping` etc)
+    "PYI041", # redundant-numeric-union, if we have special logic for ints this can cause issues, I'm not sure we need to rely on type promotions
+    "PLR09",  # too-many-arguments, too-many-statements, etc., it's not clear we want to enforce such stringent rewriting given other design choices
+    "RUF021", # parenthesize-chained-operators, this can lead to excessive brackets which reformats into excessive lines
+    "SIM118", # in-dict-keys, isn't good about handling non-dicts
+    "UP040",  # non-pep695-type-alias, PEP695 type aliases are not equivalent, they can't be used for isinstance checks or for static/class methods
+    "UP046",  # non-pep695-generic-class, PEP695 compatible class ...[T] only allows for autovariance, which doesn't handle some cases well
+    # pydocstyle (D) ignores — aligned with omitted numpydoc_validation checks below
+    "D1",     # undocumented-*, a goal but we're not there yet
+    "D205",   # blank-line-after-summary, not reliably auto-fixable
+    "D400",   # ends-in-period (SS03)
+    "D401",   # imperative-mood
+    "D404",   # docstring-starts-with-this, not checked by numpydoc_validation
+]
+
+format.skip-magic-trailing-comma = true
+
+
+[tool.ruff.lint.flake8-tidy-imports]
+banned-module-level-imports = ["ty_extensions"]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"path".msg = "Use `pathlib` instead."
+"pytz".msg = "Use built-in `zoneinfo` instead."
+
+[tool.ruff.lint.flake8-comprehensions]
+allow-dict-calls-with-keyword-arguments = true
+
+[tool.ruff.lint.flake8-import-conventions.aliases]
+"typol" = "tp"
+"polars" = "pl"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false  # Ruff wants this set to align with format.skip-magic-trailing-comma
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

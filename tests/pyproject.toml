@@ -1,0 +1,3 @@
+[tool.ruff]
+
+lint.ignore = ["PLR2004"]

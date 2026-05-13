@@ -1,0 +1,39 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.experiments.optInto": [
+			"pythonTestAdapter"
+		],
+		"python.analysis.autoImportCompletions": true,
+		"ruff.organizeImports": true,
+		"ruff.enable": true,
+		"ruff.fixAll": true,
+		"python.analysis.indexing": true,
+		"python.analysis.typeCheckingMode": "off",
+		"python.testing.pytestEnabled": true,
+		"python.testing.pytestArgs": [
+			"tests",
+		],
+		"python.testing.unittestEnabled": false,
+		"python.testing.autoTestDiscoverOnSaveEnabled": false,
+		"files.exclude": {
+			"**/*.pyc": true,
+		},
+		"[python]": {
+			"editor.defaultFormatter": "charliermarsh.ruff",
+			"editor.formatOnSave": true,
+			"editor.formatOnSaveMode": "modifications",
+			"editor.rulers": [
+				100
+			],
+			"editor.codeActionsOnSave": {
+				"source.fixAll": "explicit",
+				"source.organizeImports": "explicit"
+			},
+		},
+	},
+}
