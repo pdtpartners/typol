@@ -1,0 +1,40 @@
+name: Checks
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'release*']
+    tags: ['*']
+  pull_request:
+    paths-ignore:
+    - 'docs/**'
+    - '**/*.md'
+    - .gitignore
+    - README.md
+    - LICENSE.txt
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Fetch uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Install with uv
+        run: uv sync
+
+      - name: Format check with ruff
+        run: uv run ruff format --check
+
+      - name: Lint with ruff
+        run: uv run ruff check
+
+      - name: Typecheck with ty
+        run: uv run ty check
+
+      - name: Test with pytest
+        run: uv run pytest
