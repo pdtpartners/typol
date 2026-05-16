@@ -3,6 +3,8 @@
 name = "typol"
 version = "0.0.1"
 requires-python = ">=3.12"
+description = "A typed layer on top of Polars, for statically enforcing schema types for dataframes"
+readme = "README.md"
 dependencies = [
     "more-itertools>=11.0.2",
     "polars>=1.40.1",
