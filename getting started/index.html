@@ -1,0 +1,1032 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../expr/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Getting Started - Typol Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Typol Documentation" class="md-header__button md-logo" aria-label="Typol Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Typol Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Getting Started
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Typol Documentation" class="md-nav__button md-logo" aria-label="Typol Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Typol Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Typol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-by-step-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step-by-step guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step-by-step guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-your-shapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defining your shapes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-in-your-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading in your data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transforming-your-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transforming your data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transforming your data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#updating-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating values
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filtering-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-or-removing-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding or removing columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregating-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregating values
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-out-your-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting out your data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts-that-are-different-to-polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts that are different to Polars
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts that are different to Polars">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../expr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expressions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frame/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frames
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../row/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Row
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../series/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Series
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../types/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Types
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-by-step-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step-by-step guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step-by-step guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-your-shapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defining your shapes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reading-in-your-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading in your data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transforming-your-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transforming your data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transforming your data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#updating-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating values
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filtering-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering values
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#adding-or-removing-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding or removing columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregating-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregating values
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-out-your-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting out your data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concepts-that-are-different-to-polars" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concepts that are different to Polars
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Concepts that are different to Polars">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transform
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="getting-started">Getting Started</h1>
+<p>See the <a href="../#how-it-works"><em>How it works</em> in the README</a> for a quick introductory walkthrough. Typol should <em>mostly</em> work like Polars, so if you're stuck on how to write something, following docs for Polars should be a great place to start!</p>
+<h2 id="step-by-step-guide">Step-by-step guide</h2>
+<h3 id="defining-your-shapes">Defining your shapes</h3>
+<p>Before you can operate on your data, you'll need to declare what it looks like. In Typol, we do this using a <code>Shape</code>:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">typol</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">class</span><span class="w"> </span><span class="nc">Purchase</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">customer</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">product</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">price</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">quantity</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">date</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>
+</span></code></pre></div>
+<p>We can use int or string enums to define fixed values:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">PaymentMethod</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">CARD</span> <span class="o">=</span> <span class="s2">&quot;card&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">CASH</span> <span class="o">=</span> <span class="s2">&quot;cash&quot;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="k">class</span><span class="w"> </span><span class="nc">Purchase</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="o">...</span>  <span class="c1"># same as above</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="n">method</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="n">PaymentMethod</span><span class="p">)</span>
+</span></code></pre></div>
+<p>We should define shapes for all the fixed data we have, and we can combine them together to form new shapes:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Customer</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">age</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">phone</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">state</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># You can use `&amp;` to quickly combine shapes</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">CustomerPurchase</span> <span class="o">=</span> <span class="n">Customer</span> <span class="o">&amp;</span> <span class="n">Purchase</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># Or you can use multiple inheritence and add more fields at the same time</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="k">class</span><span class="w"> </span><span class="nc">FullPurchaseInfo</span><span class="p">(</span><span class="n">Customer</span><span class="p">,</span> <span class="n">Purchase</span><span class="p">):</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">gift_card_used</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="reading-in-your-data">Reading in your data</h3>
+<p>Now we've got some shapes, we can pull in some data. There are multiple ways to construct a Typol frame depending on where your data currently is. If you have the choice, use <code>tp.Entry</code> or <code>.set_all</code> since these provide typing guarantees!</p>
+<ul>
+<li><strong>From Polars</strong>—Let's say you already have a Polars dataframe. It's easy to convert it into a Typol frame by just passing it into the constructor:</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">purchases</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Purchase</span><span class="p">,</span> <span class="n">pl_df</span><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li><strong>From dictionaries</strong>—If you already have a list of dictionaries, you can do the same as with Polars</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">purchases</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Purchase</span><span class="p">,</span> <span class="n">list_of_dicts</span><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Using <code>tp.Entry</code></strong>—A more typed solution is to use <code>tp.Entry</code>, which enforces that all the fields set a valid for the frame, and that the fields are set to values of the correct type</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">purchases</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="n">customers</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    <span class="p">(</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>        <span class="n">tp</span><span class="o">.</span><span class="n">Entry</span><span class="o">.</span><span class="n">of</span><span class="p">(</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>            <span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">last_name</span><span class="p">),</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>            <span class="n">Customer</span><span class="o">.</span><span class="n">age</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">age</span><span class="p">),</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>            <span class="n">Customer</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">state_code</span><span class="p">),</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="p">)</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">db_results</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="p">)</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li><strong>From columnar data</strong>—If the data is in columns rather than rows, you can construct the frame by using <code>.set_all</code> for each column:</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">people</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">Person</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="p">(</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>        <span class="n">Person</span><span class="o">.</span><span class="n">age</span><span class="o">.</span><span class="n">set_all</span><span class="p">([</span><span class="mi">25</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">36</span><span class="p">]),</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>        <span class="n">Person</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">set_all</span><span class="p">([</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;Charles&quot;</span><span class="p">,</span> <span class="s2">&quot;David&quot;</span><span class="p">,</span> <span class="s2">&quot;Eve&quot;</span><span class="p">,</span> <span class="s2">&quot;Fred&quot;</span><span class="p">]),</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="p">),</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li><strong>Reading from a file</strong>—To read from a file, use <code>tp.read_csv</code>. This will handle any differences in casing or spacing for you:</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># customers.csv:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1">#   Name,Age,Phone,State</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="c1">#   Alice,21,12345678,NY</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="c1">#   Bob,22,87654321,CA</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">customers</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">Customers</span><span class="p">,</span> <span class="s2">&quot;customers.csv&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="transforming-your-data">Transforming your data</h3>
+<h4 id="updating-values">Updating values</h4>
+<p>If we're just trying to update values and not add or remove columns, you can use <code>df.with_columns</code>:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># You can use customers.s.&lt;col&gt; and Customer.&lt;col&gt; pretty interchangeably</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">customers</span> <span class="o">=</span> <span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Everyone gets a year older</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Move the quantity into the price and by one of &quot;Product x2&quot; rather than two &quot;Product&quot;s</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">purchase</span> <span class="o">=</span> <span class="n">purchase</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="c1"># Note, the _out variant of a method will lose its shape, compare `cast` that can go to other</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    <span class="c1"># representations of the same type (i.e. INT32 to INT64), with `cast_out` that can change types</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="n">purchase</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; x&quot;</span> <span class="o">+</span> <span class="n">purchase</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">cast_out</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    <span class="n">purchase</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>  <span class="c1"># This is a shortcut for `tp.lit(1).to(purchase.s.quantity)`</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    <span class="n">purchase</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">purchase</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">quantity</span><span class="p">,</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>If your expression changes types, you will no longer be able to assign it to the same column, so you'll have to give it a new column assignment using <code>.to(...)</code>:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Name everyone with their phone number</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">phone</span><span class="o">.</span><span class="n">cast_out</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="c1"># Even though this is string to string, it uses a list in the middle so loses its column, so we</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>    <span class="c1"># need to map it back with `.to(customer.s.name)`</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">list</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">customer</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>If you forget to, you'll see a type error like this:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># (1) Expected `Expr[Customer, Customer, Any]`, found `Expr[Customer, Never, str]`</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">phone</span><span class="o">.</span><span class="n">cast_out</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+</span></code></pre></div>
+<h3 id="filtering-values">Filtering values</h3>
+<p>Filtering is pretty simple, you just need to create a boolean expression:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">customers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s2">&quot;NY&quot;</span> <span class="o">|</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">starts_with</span><span class="p">(</span><span class="s2">&quot;J&quot;</span><span class="p">))</span>
+</span></code></pre></div>
+<h4 id="adding-or-removing-columns">Adding or removing columns</h4>
+<p>You'll need to define a shape to have any extra columns, and if you want to properly remove a column (rather than <code>null</code>ing it with <code>.with_columns(col.null())</code>) you'll also need to define a shape. The easiest way is to extend a current shape:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">PurchaseAtStore</span><span class="p">(</span><span class="n">Purchase</span><span class="p">):</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">location</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">purchases</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">PurchaseAtStore</span><span class="p">,</span> 
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">tp</span><span class="o">.</span><span class="n">when</span><span class="p">(</span><span class="n">purchases</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;Ice Cream&quot;</span><span class="p">))</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="s2">&quot;Beach&quot;</span><span class="p">)</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="o">.</span><span class="n">otherwise</span><span class="p">(</span><span class="s2">&quot;Downtown&quot;</span><span class="p">)</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">PurchaseAtStore</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="p">)</span>
+</span></code></pre></div>
+<p>Most commonly, you'll need to add or remove columns when joining data. This will happen automatically for you, constructing <code>LeftShape &amp; RightShape</code>:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">customer_purchases</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="n">customers</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="aggregating-values">Aggregating values</h4>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># By default, this will group by all unspecified columns</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">total_purchases</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="c1"># Calculate a weighted average by multiplying by the quantity, and dividing at the</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="c1"># end by the summed quantity</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="p">,</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">)</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">/</span> <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="p">)</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="c1"># If you just want to group by a particular column, you can specify it explicitly</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">spend_per_customer</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">customer</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">Purchase</span><span class="o">.</span><span class="n">quantity</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="n">Purchase</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="getting-out-your-data">Getting out your data</h3>
+<ul>
+<li>To go back to Polars, just use <code>my_typol_df.dataframe</code>. This can be especially helpful for intermediate operations where typing might not make sense</li>
+<li>To get each row, use <code>df.iter_rows()</code>:</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">insert_into_db</span><span class="p">(</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="n">CustomerObj</span><span class="p">(</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>        <span class="n">name</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>  <span class="c1"># Each of these is correctly typed as `str` or `int`, so is type checked</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>        <span class="n">age</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">age</span><span class="p">],</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>        <span class="n">state</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">state</span><span class="p">],</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="p">)</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">customers</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">()</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">)</span>
+</span></code></pre></div>
+<ul>
+<li>To get a column, you can access a series and convert it into a list:</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">customer_names</span> <span class="o">=</span> <span class="n">purchases</span><span class="p">[</span><span class="n">purchases</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">customer</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>  <span class="c1"># type inferred as list[str]</span>
+</span></code></pre></div>
+<ul>
+<li>Often you want to write it out to a CSV, you can simply do this with <code>.write_csv</code>, but if you want more control you can use <code>write_csv_of</code>:</li>
+</ul>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">purchases</span><span class="o">.</span><span class="n">write_csv</span><span class="p">()</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">purchases</span><span class="o">.</span><span class="n">write_csv_of</span><span class="p">(</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="c1"># `to_out` lets us leave the shape and create arbitrary names</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">to_out</span><span class="p">(</span><span class="s2">&quot;Customer Name&quot;</span><span class="p">),</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">to_out</span><span class="p">(</span><span class="s2">&quot;Product Name&quot;</span><span class="p">),</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="concepts-that-are-different-to-polars">Concepts that are different to Polars</h2>
+<p>Apart from the obvious <code>tp.Shape</code> differences, here are a couple things you should be aware of coming from Polars</p>
+<h3 id="transform"><code>transform</code></h3>
+<p>In Polars we use select and with_columns, in Typol we need to be explicit about which shape we're going to, so <code>transform</code> fills the role of these. <code>with_columns</code> is still helpful when no new columns are being added.</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Polars</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="c1"># Typol</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="n">age</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1"># Typol will always select all available columns</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></div>
+<h1 id="to"><code>to</code></h1>
+<p>Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, <code>.alias</code> is simply called <code>.to</code> in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Polars</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;age_next_year&quot;</span><span class="p">)</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Typol</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="p">(</span><span class="n">person</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">FuturePerson</span><span class="o">.</span><span class="n">age_next_year</span><span class="p">)</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
