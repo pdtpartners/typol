@@ -21,13 +21,13 @@ jobs:
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       - name: Install Python 3.13
         run: uv python install 3.13
-      - name: uv sync test dependencies
+      - name: Sync test dependencies
         run: uv sync --group test
       - name: Build
         run: uv build
       - name: Test wheel
-        run: uv run --isolated --no-project --with dist/*.whl pytest
+        run: uv run --isolated --no-project --with dist/*.whl --with pytest pytest
       - name: Test tarball
-        run: uv run --isolated --no-project --with dist/*.tar.gz pytest
+        run: uv run --isolated --no-project --with dist/*.tar.gz --with pytest pytest
       - name: Publish
         run: uv publish
