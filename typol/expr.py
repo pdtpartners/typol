@@ -275,6 +275,138 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
         substr = _pl_expr(substring)
         return IntermediateExpr(self.expr.expr.str.contains(substr, literal=literal))
 
+    def contains_any[Q: Shape](
+        self, substrings: Collection[ExoExpr[Q, str] | str], *, ascii_case_insensitive: bool = False
+    ) -> MesoExpr[Intersection[S, Q], bool]:
+        """
+        Whether each column value contains the regex (or if `ascii_case_insensitive` is set, then
+        the match can be either upper or lower case)
+        """
+        substrs = [_pl_expr(s) for s in substrings]
+        return IntermediateExpr(
+            self.expr.expr.str.contains_any(substrs, ascii_case_insensitive=ascii_case_insensitive)
+        )
+
+    def count_matches[Q: Shape](
+        self, substring: ExoExpr[Q, str] | str, literal: bool = False
+    ) -> MesoExpr[Intersection[S, Q], int]:
+        """
+        How many times each column value contains the regex pattern (or if `literal` is set, the
+        fixed-string)
+        """
+        substr = _pl_expr(substring)
+        return IntermediateExpr(self.expr.expr.str.count_matches(substr, literal=literal))
+
+    def decode(self, encoding: Literal["hex", "base64"]) -> MesoExpr[S, bytes]:
+        return IntermediateExpr(self.expr.expr.str.decode(encoding))
+
+    def encode(self, encoding: Literal["hex", "base64"]) -> EndoExpr[S, str]:
+        return IntermediateExpr(self.expr.expr.str.encode(encoding))
+
+    def normalize(self, form: Literal["NFC", "NFKC", "NFD", "NFKD"] = "NFC") -> EndoExpr[S, str]:
+        return IntermediateExpr(self.expr.expr.str.normalize(form))
+
+    def escape_regex(self) -> EndoExpr[S, str]:
+        """Turn the string into a pattern that will only literally match its value"""
+        return IntermediateExpr(self.expr.expr.str.escape_regex())
+
+    def extract[Q: Shape](
+        self, pattern: ExoExpr[Q, str] | str, group_index: int = 1
+    ) -> EndoExpr[Intersection[S, Q], bool]:
+        """Extract the 1st or `group_index`th regex capture group from the column"""
+        return IntermediateExpr(self.expr.expr.str.extract(_pl_expr(pattern), group_index))
+
+    def extract_all[Q: Shape](
+        self, pattern: ExoExpr[Q, str] | str
+    ) -> MesoExpr[Intersection[S, Q], list[str]]:
+        """Extract all regex capture group as a list from the column"""
+        return IntermediateExpr(self.expr.expr.str.extract_all(_pl_expr(pattern)))
+
+    def extract_groups[Q: Shape](
+        self, pattern: ExoExpr[Q, str] | str
+    ) -> MesoExpr[Intersection[S, Q], Mapping[str, str]]:
+        """Extract all regex capture group as a dict from the column"""
+        return IntermediateExpr(self.expr.expr.str.extract_all(_pl_expr(pattern)))
+
+    def extract_many[Q: Shape](
+        self,
+        patterns: Collection[ExoExpr[Q, str] | str] | ExoExpr[Q, list[str]] | ExoExpr[Q, str] | str,
+        *,
+        ascii_case_insensitive: bool = False,
+        overlapping: bool = False,
+        leftmost: bool = False,
+    ) -> MesoExpr[Intersection[S, Q], list[str]]:
+        """Extract multiple fixed strings from the column"""
+        pats = (
+            [_pl_expr(e) for e in patterns]
+            if isinstance(patterns, Collection) and not isinstance(patterns, str)
+            else _pl_expr(patterns)
+        )
+        return IntermediateExpr(
+            self.expr.expr.str.extract_many(
+                pats,
+                ascii_case_insensitive=ascii_case_insensitive,
+                overlapping=overlapping,
+                leftmost=leftmost,
+            )
+        )
+
+    def find[Q: Shape](
+        self, substring: ExoExpr[Q, str] | str, *, literal: bool = False, strict: bool = True
+    ) -> MesoExpr[Intersection[S, Q], int]:
+        """The index of the first match of the regex (or if `literal` is set, the fixed-string)"""
+        substr = _pl_expr(substring)
+        return IntermediateExpr(self.expr.expr.str.find(substr, literal=literal, strict=strict))
+
+    def find_many[Q: Shape](
+        self,
+        patterns: ExoExpr[Q, str] | str,
+        *,
+        ascii_case_insensitive: bool = False,
+        overlapping: bool = False,
+        leftmost: bool = False,
+    ) -> MesoExpr[Intersection[S, Q], list[int]]:
+        """The index of the many matches of the fixed-strings"""
+        pats = (
+            [_pl_expr(e) for e in patterns]
+            if isinstance(patterns, Collection) and not isinstance(patterns, str)
+            else _pl_expr(patterns)
+        )
+        return IntermediateExpr(
+            self.expr.expr.str.find_many(
+                pats,
+                ascii_case_insensitive=ascii_case_insensitive,
+                overlapping=overlapping,
+                leftmost=leftmost,
+            )
+        )
+
+    def head[Q: Shape](self, n: ExoExpr[Q, int] | int) -> Expr[Intersection[S, Q], S, str]:
+        """Take the first `n` characters from each string"""
+        return IntermediateExpr(self.expr.expr.str.head(_pl_expr(n)))
+
+    def tail[Q: Shape](self, n: ExoExpr[Q, int] | int) -> Expr[Intersection[S, Q], S, str]:
+        """Take the last `n` characters from each string"""
+        return IntermediateExpr(self.expr.expr.str.tail(_pl_expr(n)))
+
+    def pad_end[Q: Shape](
+        self, length: ExoExpr[Q, int] | int, fill_char: str = " "
+    ) -> Expr[Intersection[S, Q], S, str]:
+        """Ensure the strings are at least `length` long, adding `fill_char` to make up the difference"""
+        return IntermediateExpr(self.expr.expr.str.pad_end(_pl_expr(length), fill_char))
+
+    def pad_start[Q: Shape](
+        self, length: ExoExpr[Q, int] | int, fill_char: str = " "
+    ) -> Expr[Intersection[S, Q], S, str]:
+        """Ensure the strings are at least `length` long, adding `fill_char` to make up the difference"""
+        return IntermediateExpr(self.expr.expr.str.pad_start(_pl_expr(length), fill_char))
+
+    def json_path_match[Q: Shape](
+        self, json_path: ExoExpr[Q, str] | str
+    ) -> Expr[Intersection[S, Q], S, str]:
+        """Extract the value from the JSON string at the given path"""
+        return IntermediateExpr(self.expr.expr.str.json_path_match(_pl_expr(json_path)))
+
     def starts_with[Q: Shape](
         self, suffix: ExoExpr[Q, str] | str
     ) -> MesoExpr[Intersection[S, Q], bool]:
@@ -290,6 +422,10 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
     def len_chars(self) -> MesoExpr[S, int]:
         """Count the number of unicode characters in the string"""
         return IntermediateExpr(self.expr.expr.str.len_chars())
+
+    def len_bytes(self) -> MesoExpr[S, int]:
+        """Count the number of bytes in the string"""
+        return IntermediateExpr(self.expr.expr.str.len_bytes())
 
     def join(self, sep: str) -> AggExpr[S, R, str]:
         """Aggregate a group of strings by interspersing `sep` between them and concatenating"""
@@ -321,11 +457,66 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
             self.expr.expr.str.replace_all(_pl_expr(pattern), _pl_expr(value), literal=literal)
         )
 
+    def replace_many[SA: Shape, SB: Shape](
+        self,
+        patterns: Collection[ExoExpr[SA, str] | str]
+        | ExoExpr[SA, list[str]]
+        | ExoExpr[SA, str]
+        | str,
+        replace_with: Collection[ExoExpr[SB, str] | str]
+        | ExoExpr[SB, list[str]]
+        | ExoExpr[SB, str]
+        | str,
+        *,
+        ascii_case_insensitive: bool = False,
+        leftmost: bool = False,
+    ) -> Expr[Intersection[S, SA] | SB, R, str]:
+        """Replace many matches for the fixed-string pattern with `value`"""
+        pats = (
+            [_pl_expr(e) for e in patterns]
+            if isinstance(patterns, Collection) and not isinstance(patterns, str)
+            else _pl_expr(patterns)
+        )
+        rws = (
+            [_pl_expr(e) for e in replace_with]
+            if isinstance(replace_with, Collection) and not isinstance(replace_with, str)
+            else _pl_expr(replace_with)
+        )
+        return IntermediateExpr(
+            self.expr.expr.str.replace_many(
+                pats, rws, ascii_case_insensitive=ascii_case_insensitive, leftmost=leftmost
+            )
+        )
+
     def strip_chars[SA: Shape](
         self, characters: ExoExpr[SA, str] | str | None = None
     ) -> Expr[Intersection[S, SA], R, str]:
         """Remove leading and trailing characters in the given string. By default removes whitespace"""
         return IntermediateExpr(self.expr.expr.str.strip_chars(_pl_expr_or_none(characters)))
+
+    def strip_chars_end[SA: Shape](
+        self, characters: ExoExpr[SA, str] | str | None = None
+    ) -> Expr[Intersection[S, SA], R, str]:
+        """Remove trailing characters in the given string. By default removes whitespace"""
+        return IntermediateExpr(self.expr.expr.str.strip_chars_end(_pl_expr_or_none(characters)))
+
+    def strip_chars_start[SA: Shape](
+        self, characters: ExoExpr[SA, str] | str | None = None
+    ) -> Expr[Intersection[S, SA], R, str]:
+        """Remove leading characters in the given string. By default removes whitespace"""
+        return IntermediateExpr(self.expr.expr.str.strip_chars_start(_pl_expr_or_none(characters)))
+
+    def strip_prefix[SA: Shape](
+        self, prefix: ExoExpr[SA, str] | str | None = None
+    ) -> Expr[Intersection[S, SA], R, str]:
+        """Remove leading substring from the given string"""
+        return IntermediateExpr(self.expr.expr.str.strip_prefix(_pl_expr_or_none(prefix)))
+
+    def strip_suffix[SA: Shape](
+        self, prefix: ExoExpr[SA, str] | str | None = None
+    ) -> Expr[Intersection[S, SA], R, str]:
+        """Remove trailing substring from the given string"""
+        return IntermediateExpr(self.expr.expr.str.strip_suffix(_pl_expr_or_none(prefix)))
 
     def to_date(self, format: str, *, strict: bool = True) -> MesoExpr[S, datetime.date]:
         return IntermediateExpr(self.expr.expr.str.to_date(format, strict=strict))
@@ -350,6 +541,9 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
     def to_titlecase(self) -> Expr[S, R, T]:
         return IntermediateExpr(self.expr.expr.str.to_titlecase())
 
+    def reverse(self) -> Expr[S, R, T]:
+        return IntermediateExpr(self.expr.expr.str.reverse())
+
     def to_decimal(self, *, scale: int) -> ExoExpr[S, Decimal]:
         return IntermediateExpr(self.expr.expr.str.to_decimal(scale=scale))
 
@@ -368,10 +562,46 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
         return IntermediateExpr(self.expr.expr.is_not_null() & self.expr.expr.ne(""))
 
     def split[SA: Shape](
-        self, sep: ExoExpr[SA, str] | str
+        self,
+        sep: ExoExpr[SA, str] | str,
+        *,
+        inclusive: bool = False,
+        literal: bool = False,
+        strict: bool = True,
     ) -> MesoExpr[Intersection[S, SA], list[str]]:
         """Break a string into a list of strings, using `sep` as the separator"""
-        return IntermediateExpr(self.expr.expr.str.split(_pl_expr(sep)))
+        return IntermediateExpr(
+            self.expr.expr.str.split(
+                _pl_expr(sep), inclusive=inclusive, literal=literal, strict=strict
+            )
+        )
+
+    def splitn[SA: Shape](
+        self, sep: ExoExpr[SA, str] | str, n: int
+    ) -> MesoExpr[Intersection[S, SA], list[str]]:
+        """Break a string into a list of `n` strings, using `sep` as the separator"""
+        return IntermediateExpr(self.expr.expr.str.splitn(_pl_expr(sep), n))
+
+    def split_exact[SA: Shape](
+        self, sep: ExoExpr[SA, str] | str, n: int, *, inclusive: bool = False
+    ) -> MesoExpr[Intersection[S, SA], list[str]]:
+        """Break a string into a list of exactly `n` strings, using `sep` as the separator"""
+        return IntermediateExpr(
+            self.expr.expr.str.split_exact(_pl_expr(sep), n, inclusive=inclusive)
+        )
+
+    def slice[SA: Shape, SB: Shape](
+        self, offset: ExoExpr[SA, int] | int, length: ExoExpr[SB, int] | int | None = None
+    ) -> MesoExpr[Intersection[S, SA, SB], str]:
+        """
+        Take characters starting from offset, up to `offset + length`, or the end of the string if
+        set to `None`
+        """
+        return IntermediateExpr(
+            self.expr.expr.str.slice(
+                _pl_expr(offset), _pl_expr(length) if length is not None else None
+            )
+        )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -568,6 +798,9 @@ class StructExprNamespace[S: Shape, R: Shape, M: Shape]:
 
     def field[T](self, dim: BoundDimension[M, T]) -> MesoExpr[S, T]:
         return IntermediateExpr(self.expr.expr.struct.field(dim.name))
+
+    def __getitem__[T](self, dim: BoundDimension[M, T]) -> MesoExpr[S, T]:
+        return self.field(dim)
 
     def map_rows_to[T, Q: Shape](
         self, transform: Callable[[Row[M]], T | None], to: BoundDimension[Q, T]
