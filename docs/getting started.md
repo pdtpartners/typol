@@ -148,7 +148,7 @@ If you forget to, you'll see a type error like this:
 customers.with_columns(customers.s.phone.cast_out(str))
 ```
 
-### Filtering values
+#### Filtering values
 
 Filtering is pretty simple, you just need to create a boolean expression:
 
@@ -182,6 +182,21 @@ customer_purchases = purchases.join(
     how="left",
 )
 ```
+
+If there are conflicts when joining columns, you can add suffixes to one of the frames to refer to them independently:
+
+```py
+# Add a suffix to all the columns so they can be referred to independently
+other_customers = customers.suffix()
+# Join customers against itself to find ones where the names conflict
+customers_with_the_same_name = customers.join(
+    other_customers,
+    # To refer to suffixed columns, do suffixed_shape(original_column)
+    customers.s.name.on(other_customers.s(Customer.name))
+    how="cross"
+).filter(customer.s.phone != other_customers.s(Customer.phone))
+```
+
 
 #### Aggregating values
 
@@ -261,7 +276,7 @@ customers.transform(Person, customers.s.name.str.strip_chars(), customers.s.age 
 customers.with_columns(customers.s.name.str.strip_chars(), customers.s.age + 1)
 ```
 
-# `to`
+### `to`
 
 Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, `.alias` is simply called `.to` in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.
 
