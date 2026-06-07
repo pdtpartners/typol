@@ -1,0 +1,3 @@
+# Types
+
+::: typol.types

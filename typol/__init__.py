@@ -113,6 +113,8 @@ from .types import (
 len = length
 min = Expr.min
 max = Expr.max
+read_csv = DataFrame.read_csv
+scan_csv = LazyFrame.scan_csv
 
 __all__ = [
     "BOOLEAN",
@@ -176,7 +178,9 @@ __all__ = [
     "min_horizontal",
     "null",
     "projection",
+    "read_csv",
     "row_index",
+    "scan_csv",
     "struct",
     "struct_of",
     "suffix",

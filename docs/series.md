@@ -1,0 +1,3 @@
+# Series
+
+::: typol.series

@@ -38,3 +38,13 @@ jobs:
 
       - name: Test with pytest
         run: uv run pytest
+
+      - name: Build docs
+        run: uv run mkdocs build -d _docs-out
+
+      - name: Deploy docs to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public

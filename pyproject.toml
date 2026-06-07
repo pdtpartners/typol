@@ -32,9 +32,17 @@ check = [
     "ruff>=0.15.12",
     "ty>=0.0.35",
 ]
+docs = [
+    "mkdocs",
+    "mkdocstrings[python]",
+    "mkdocs-material",
+    "mkdocs-nav-weight",
+    "pymdown-extensions",
+]
 dev = [
     {include-group = "test"},
     {include-group = "check"},
+    {include-group = "docs"},
 ]
 
 [tool.pytest.ini_options]

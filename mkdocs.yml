@@ -1,0 +1,19 @@
+site_name: Typol Documentation
+
+theme:
+  name: "material"
+
+plugins:
+- search
+- mkdocstrings
+- mkdocs-nav-weight
+
+markdown_extensions:
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: ["."]
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
