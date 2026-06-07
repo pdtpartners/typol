@@ -341,11 +341,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
           <li class="md-nav__item">
   <a href="#filtering-values" class="md-nav__link">
     <span class="md-ellipsis">
@@ -355,8 +350,7 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Filtering values">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#adding-or-removing-columns" class="md-nav__link">
@@ -418,6 +412,17 @@
     <span class="md-ellipsis">
       
         transform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to
       
     </span>
   </a>
@@ -655,11 +660,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
           <li class="md-nav__item">
   <a href="#filtering-values" class="md-nav__link">
     <span class="md-ellipsis">
@@ -669,8 +669,7 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Filtering values">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#adding-or-removing-columns" class="md-nav__link">
@@ -732,6 +731,17 @@
     <span class="md-ellipsis">
       
         transform
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to
       
     </span>
   </a>
@@ -874,7 +884,7 @@
 <div class="language-py highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># (1) Expected `Expr[Customer, Customer, Any]`, found `Expr[Customer, Never, str]`</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">phone</span><span class="o">.</span><span class="n">cast_out</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
 </span></code></pre></div>
-<h3 id="filtering-values">Filtering values</h3>
+<h4 id="filtering-values">Filtering values</h4>
 <p>Filtering is pretty simple, you just need to create a boolean expression:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">customers</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s2">&quot;NY&quot;</span> <span class="o">|</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">starts_with</span><span class="p">(</span><span class="s2">&quot;J&quot;</span><span class="p">))</span>
 </span></code></pre></div>
@@ -898,77 +908,88 @@
 </span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
 </span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">)</span>
 </span></code></pre></div>
+<p>If there are conflicts when joining columns, you can add suffixes to one of the frames to refer to them independently:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Add a suffix to all the columns so they can be referred to independently</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">other_customers</span> <span class="o">=</span> <span class="n">customers</span><span class="o">.</span><span class="n">suffix</span><span class="p">()</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="c1"># Join customers against itself to find ones where the names conflict</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">customers_with_the_same_name</span> <span class="o">=</span> <span class="n">customers</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">other_customers</span><span class="p">,</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="c1"># To refer to suffixed columns, do suffixed_shape(original_column)</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">on</span><span class="p">(</span><span class="n">other_customers</span><span class="o">.</span><span class="n">s</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;cross&quot;</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">customer</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">phone</span> <span class="o">!=</span> <span class="n">other_customers</span><span class="o">.</span><span class="n">s</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">phone</span><span class="p">))</span>
+</span></code></pre></div>
 <h4 id="aggregating-values">Aggregating values</h4>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># By default, this will group by all unspecified columns</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">total_purchases</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="c1"># Calculate a weighted average by multiplying by the quantity, and dividing at the</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="c1"># end by the summed quantity</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="p">,</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">)</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">/</span> <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="p">)</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="c1"># If you just want to group by a particular column, you can specify it explicitly</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">spend_per_customer</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">customer</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>    <span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">Purchase</span><span class="o">.</span><span class="n">quantity</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="n">Purchase</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
-</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="p">)</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># By default, this will group by all unspecified columns</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">total_purchases</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="c1"># Calculate a weighted average by multiplying by the quantity, and dividing at the</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="c1"># end by the summed quantity</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="p">,</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">)</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">price</span> <span class="o">/</span> <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">quantity</span><span class="p">)</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="c1"># If you just want to group by a particular column, you can specify it explicitly</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="n">spend_per_customer</span> <span class="o">=</span> <span class="n">purchases</span><span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">customer</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>    <span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">price</span> <span class="o">*</span> <span class="n">Purchase</span><span class="o">.</span><span class="n">quantity</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="n">Purchase</span><span class="o">.</span><span class="n">quantity</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="p">)</span>
 </span></code></pre></div>
 <h3 id="getting-out-your-data">Getting out your data</h3>
 <ul>
 <li>To go back to Polars, just use <code>my_typol_df.dataframe</code>. This can be especially helpful for intermediate operations where typing might not make sense</li>
 <li>To get each row, use <code>df.iter_rows()</code>:</li>
 </ul>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">insert_into_db</span><span class="p">(</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="n">CustomerObj</span><span class="p">(</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>        <span class="n">name</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>  <span class="c1"># Each of these is correctly typed as `str` or `int`, so is type checked</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>        <span class="n">age</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">age</span><span class="p">],</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>        <span class="n">state</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">state</span><span class="p">],</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="p">)</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">customers</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">()</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="p">)</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">insert_into_db</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    <span class="n">CustomerObj</span><span class="p">(</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>        <span class="n">name</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">name</span><span class="p">],</span>  <span class="c1"># Each of these is correctly typed as `str` or `int`, so is type checked</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>        <span class="n">age</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">age</span><span class="p">],</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>        <span class="n">state</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="n">Customer</span><span class="o">.</span><span class="n">state</span><span class="p">],</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    <span class="p">)</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">customers</span><span class="o">.</span><span class="n">iter_rows</span><span class="p">()</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="p">)</span>
 </span></code></pre></div>
 <ul>
 <li>To get a column, you can access a series and convert it into a list:</li>
 </ul>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">customer_names</span> <span class="o">=</span> <span class="n">purchases</span><span class="p">[</span><span class="n">purchases</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">customer</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>  <span class="c1"># type inferred as list[str]</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">customer_names</span> <span class="o">=</span> <span class="n">purchases</span><span class="p">[</span><span class="n">purchases</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">customer</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>  <span class="c1"># type inferred as list[str]</span>
 </span></code></pre></div>
 <ul>
 <li>Often you want to write it out to a CSV, you can simply do this with <code>.write_csv</code>, but if you want more control you can use <code>write_csv_of</code>:</li>
 </ul>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">purchases</span><span class="o">.</span><span class="n">write_csv</span><span class="p">()</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">purchases</span><span class="o">.</span><span class="n">write_csv_of</span><span class="p">(</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>    <span class="c1"># `to_out` lets us leave the shape and create arbitrary names</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">to_out</span><span class="p">(</span><span class="s2">&quot;Customer Name&quot;</span><span class="p">),</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">to_out</span><span class="p">(</span><span class="s2">&quot;Product Name&quot;</span><span class="p">),</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">)</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">purchases</span><span class="o">.</span><span class="n">write_csv</span><span class="p">()</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">purchases</span><span class="o">.</span><span class="n">write_csv_of</span><span class="p">(</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="c1"># `to_out` lets us leave the shape and create arbitrary names</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">customer</span><span class="o">.</span><span class="n">to_out</span><span class="p">(</span><span class="s2">&quot;Customer Name&quot;</span><span class="p">),</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="n">purchases</span><span class="o">.</span><span class="n">c</span><span class="o">.</span><span class="n">product</span><span class="o">.</span><span class="n">to_out</span><span class="p">(</span><span class="s2">&quot;Product Name&quot;</span><span class="p">),</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="concepts-that-are-different-to-polars">Concepts that are different to Polars</h2>
 <p>Apart from the obvious <code>tp.Shape</code> differences, here are a couple things you should be aware of coming from Polars</p>
 <h3 id="transform"><code>transform</code></h3>
 <p>In Polars we use select and with_columns, in Typol we need to be explicit about which shape we're going to, so <code>transform</code> fills the role of these. <code>with_columns</code> is still helpful when no new columns are being added.</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Polars</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="c1"># Typol</span>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="n">age</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
-</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1"># Typol will always select all available columns</span>
-</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span>
-</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span></code></pre></div>
-<h1 id="to"><code>to</code></h1>
-<p>Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, <code>.alias</code> is simply called <code>.to</code> in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Polars</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;age_next_year&quot;</span><span class="p">)</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="c1"># Typol</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="p">(</span><span class="n">person</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">FuturePerson</span><span class="o">.</span><span class="n">age_next_year</span><span class="p">)</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="c1"># Typol</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="n">age</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>
+</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="c1"># Typol will always select all available columns</span>
+</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span>
+</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="to"><code>to</code></h3>
+<p>Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, <code>.alias</code> is simply called <code>.to</code> in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Polars</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;age_next_year&quot;</span><span class="p">)</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># Typol</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">(</span><span class="n">person</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">FuturePerson</span><span class="o">.</span><span class="n">age_next_year</span><span class="p">)</span>
 </span></code></pre></div>
 
 
