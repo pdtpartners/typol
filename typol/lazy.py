@@ -20,6 +20,7 @@ from typing import (
 
 import more_itertools
 import polars as pl
+import polars.lazyframe.group_by
 from more_itertools import first, prepend
 
 from typol.expr import (
@@ -89,9 +90,9 @@ class LazyFrame(Generic[_S_co]):
             df = enforce_shape(shape, values)
         elif isinstance(values, tuple) and isinstance(values[0], ColumnInitializer):
             initializers = cast(tuple[ColumnInitializer[_S_co, Any], ...], values)
-            df = pl.DataFrame({i.dimension.name: i.value for i in initializers}, schema=meta.schema)
+            df = pl.LazyFrame({i.dimension.name: i.value for i in initializers}, schema=meta.schema)
         elif isinstance(values, Mapping):
-            df = pl.DataFrame(
+            df = pl.LazyFrame(
                 {k.name if isinstance(k, BoundDimension) else k: vs for k, vs in values.items()},
                 schema=meta.schema,
             )
@@ -102,7 +103,7 @@ class LazyFrame(Generic[_S_co]):
                 df = pl.LazyFrame(schema=meta.schema)
             elif isinstance(first, ColumnInitializer):
                 initializers = cast(Iterable[ColumnInitializer[_S_co, Any]], values)
-                df = pl.DataFrame(
+                df = pl.LazyFrame(
                     {i.dimension.name: i.value for i in initializers}, schema=meta.schema
                 )
             elif isinstance(first, Mapping) and type(first) is not dict:
@@ -140,7 +141,7 @@ class LazyFrame(Generic[_S_co]):
         return LazySeries[T](self.dataframe.select(s.expr.alias("series")))
 
     def get_column[T](self, s: BoundDimension[_S_co, T]) -> LazySeries[T]:
-        return self[s]
+        return self.__getitem__(s)
 
     def head(self, n: int = 5) -> LazyFrame[_S_co]:
         return LazyFrame(self.shape, self.dataframe.head(n))
@@ -226,8 +227,15 @@ class LazyFrame(Generic[_S_co]):
             self.shape,
             self.dataframe.group_by(
                 *map(pl.col, self.dataframe.collect_schema().keys() - aggregating)
-            ).agg(*([e.expr for e in agg])),
+            ).agg(*(e.expr for e in agg)),
         )
+
+    def group_by(self, *keys: EndoExpr[_S_co, Any]) -> LazyGroupBy[_S_co, _S_co]:
+        """
+        Determine a series of expressions to group the dataframe by, this should be followed by an
+        agg to apply aggregations to the grouped frame
+        """
+        return LazyGroupBy(self.shape, self.dataframe.group_by(*(k.expr for k in keys)))
 
     def agg_transform[Q: Shape](
         self, shape: type[Q], *exprs: AggExpr[_S_co, Q, Any] | Expr[_S_co, Q, Any]
@@ -253,6 +261,15 @@ class LazyFrame(Generic[_S_co]):
                 )
             ).agg(*aggregating.values()),
         )
+
+    def group_by_transform[Q: Shape](
+        self, shape: type[Q], *keys: Expr[_S_co, Q, Any]
+    ) -> LazyGroupBy[_S_co, Q]:
+        """
+        Determine a series of expressions to group the dataframe by, this should be followed by an
+        agg to apply aggregations to the grouped frame
+        """
+        return LazyGroupBy(shape, self.dataframe.group_by(*(k.expr for k in keys)))
 
     @classmethod
     def concat(cls, shape: type[_S_co], frames: Iterable[Self]) -> LazyFrame[_S_co]:
@@ -427,3 +444,13 @@ class LazyFrame(Generic[_S_co]):
         else:
             joined = self.dataframe.join(right.dataframe, how=how)
         return LazyFrame["Intersection[_S_co, Q]"](self.shape & right.shape, joined)
+
+
+@dataclasses.dataclass
+class LazyGroupBy[S: Shape, Q: Shape]:
+    shape: type[Q]
+    group_by: pl.lazyframe.group_by.LazyGroupBy
+
+    def agg(self, *agg: AggExpr[S, Q, Any]) -> LazyFrame[Q]:
+        """Define the aggregating expressions to group rows in the dataframe"""
+        return LazyFrame(self.shape, self.group_by.agg(*(e.expr for e in agg)))

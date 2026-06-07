@@ -149,7 +149,8 @@ class PostageRateStore(ABC):
         # benchmarks whilst only including days that this rate is valid for
         schedule = schedule.explode(
             tp.date_ranges(
-                tp.max(query.start, schedule.s.start), tp.min(query.end, schedule.s.end)
+                tp.max_horizontal(query.start, schedule.s.start),
+                tp.min_horizontal(query.end, schedule.s.end),
             ).list.explode_to(schedule.s.end)
         ).with_columns(schedule.s.end.to(schedule.s.start))
 

@@ -186,6 +186,13 @@ class DataFrame(Generic[_S_co]):
         """
         return self.lazy().agg(*agg).collect()
 
+    def group_by(self, *keys: EndoExpr[_S_co, Any]) -> GroupBy[_S_co, _S_co]:
+        """
+        Determine a series of expressions to group the dataframe by, this should be followed by an
+        agg to apply aggregations to the grouped frame
+        """
+        return GroupBy(self.shape, self.dataframe.group_by(*(k.expr for k in keys)))
+
     def agg_transform[Q: Shape](
         self, shape: type[Q], *agg: AggExpr[_S_co, Q, Any] | Expr[_S_co, Q, Any]
     ) -> DataFrame[Q]:
@@ -197,6 +204,15 @@ class DataFrame(Generic[_S_co]):
         This allows transforming the aggregated columns since aggregation may change types
         """
         return self.lazy().agg_transform(shape, *agg).collect()
+
+    def group_by_transform[Q: Shape](
+        self, shape: type[Q], *keys: Expr[_S_co, Q, Any]
+    ) -> GroupBy[_S_co, Q]:
+        """
+        Determine a series of expressions to group the dataframe by, this should be followed by an
+        agg to apply aggregations to the grouped frame
+        """
+        return GroupBy(shape, self.dataframe.group_by(*(k.expr for k in keys)))
 
     def explode(self, *explosions: Explosion[_S_co, _S_co, Any]) -> DataFrame[_S_co]:
         """
@@ -545,3 +561,13 @@ def enforce_shape[S: Shape](
     return dataframe.select(
         pl.col(d).cast(t, strict=True) for d, t in shape.shape_meta().datatypes.items()
     )
+
+
+@dataclasses.dataclass
+class GroupBy[S: Shape, Q: Shape]:
+    shape: type[Q]
+    group_by: pl.dataframe.frame.GroupBy
+
+    def agg(self, *agg: AggExpr[S, Q, Any]) -> DataFrame[Q]:
+        """Define the aggregating expressions to group rows in the dataframe"""
+        return DataFrame(self.shape, self.group_by.agg(*(e.expr for e in agg)))

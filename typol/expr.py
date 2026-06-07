@@ -1126,6 +1126,26 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def __truediv__(self, other: Expr | object) -> Expr:
         return IntermediateExpr(self.expr / _pl_expr(other))
 
+    @overload
+    def __floordiv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, N] | N
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __floordiv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __floordiv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __floordiv__[SA: Shape](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, int] | int
+    ) -> MesoExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __floordiv__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(self.expr // _pl_expr(other))
+
     def __neg__[N: (float, Decimal, datetime.timedelta, int)](
         self: Expr[_S_contra, _R_contra, N],
     ) -> Expr[_S_contra, _R_contra, N]:
@@ -1169,12 +1189,12 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         """Replace 0 and `nan` with null"""
         return when(self.is_significant()).then(self)
 
-    def greatest[SA: Shape](
+    def max_horizontal[SA: Shape](
         self, *others: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]:
         return IntermediateExpr(pl.max_horizontal(self.expr, *map(_pl_expr, others)))
 
-    def least[SA: Shape](
+    def min_horizontal[SA: Shape](
         self, *others: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]:
         return IntermediateExpr(pl.min_horizontal(self.expr, *map(_pl_expr, others)))
@@ -1344,7 +1364,7 @@ class When(Generic[_S_contra]):
         self, otherwise: Expr | T
     ) -> PartialConditional[Intersection[_S_contra, SA], R, T]:
         return PartialConditional(
-            pl.when((~all(self.conditions)).expr).then(_expr_or_lit(otherwise).expr)
+            pl.when((~all_horizontal(self.conditions)).expr).then(_expr_or_lit(otherwise).expr)
         )
 
 
@@ -1395,10 +1415,10 @@ def when[S: Shape](*conditions: ExoExpr[S, bool]) -> When[S]:
     return When(conditions)
 
 
-def any[S: Shape, R: Shape](
+def any_horizontal[S: Shape, R: Shape](
     *conditions: Expr[S, R, bool] | Iterable[Expr[S, R, bool]],
 ) -> Expr[S, R, bool]:
-    """`or` all the given conditions, i.e. when any is true. For `pl.any`, use Expr.any"""
+    """`or` all the given conditions, i.e. when any is true"""
     return IntermediateExpr(
         pl.any_horizontal(
             *(map(_pl_expr, c) if isinstance(c, Iterable) else _pl_expr(c) for c in conditions)
@@ -1406,7 +1426,7 @@ def any[S: Shape, R: Shape](
     )
 
 
-def all[S: Shape, R: Shape](
+def all_horizontal[S: Shape, R: Shape](
     *conditions: Expr[S, R, bool] | Iterable[Expr[S, R, bool]],
 ) -> Expr[S, R, bool]:
     """`and` all the given conditions, i.e. when all is true"""
@@ -1420,7 +1440,7 @@ def all[S: Shape, R: Shape](
 type Orderable = int | float | datetime.date | datetime.datetime | Decimal | str
 
 
-def min[S: Shape, R: Shape, T: Orderable](
+def min_horizontal[S: Shape, R: Shape, T: Orderable](
     *exprs: Expr[S, R, T] | T | Iterable[Expr[S, R, T] | T],
 ) -> Expr[S, R, T]:
     """Min the given exprs, i.e. take the smallest. For `pl.min`, use Expr.min"""
@@ -1431,7 +1451,7 @@ def min[S: Shape, R: Shape, T: Orderable](
     )
 
 
-def max[S: Shape, R: Shape, T: Orderable](
+def max_horizontal[S: Shape, R: Shape, T: Orderable](
     *exprs: Expr[S, R, T] | T | Iterable[Expr[S, R, T] | T],
 ) -> Expr[S, R, T]:
     """Max the given exprs, i.e. take the largest. For `pl.max`, use Expr.max"""

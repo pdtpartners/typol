@@ -58,8 +58,8 @@ from .expr import (
     Shape,
     Suffixed,
     When,
-    all,
-    any,
+    all_horizontal,
+    any_horizontal,
     arg_sort_by,
     concat_list,
     date,
@@ -71,8 +71,8 @@ from .expr import (
     element,
     length,
     lit,
-    max,
-    min,
+    max_horizontal,
+    min_horizontal,
     null,
     projection,
     row_index,
@@ -111,6 +111,8 @@ from .types import (
 )
 
 len = length
+min = Expr.min
+max = Expr.max
 
 __all__ = [
     "BOOLEAN",
@@ -148,7 +150,9 @@ __all__ = [
     "Type",
     "When",
     "all",
+    "all_horizontal",
     "any",
+    "any_horizontal",
     "arg_sort_by",
     "concat_list",
     "date",
@@ -167,7 +171,9 @@ __all__ = [
     "list_of",
     "lit",
     "max",
+    "max_horizontal",
     "min",
+    "min_horizontal",
     "null",
     "projection",
     "row_index",

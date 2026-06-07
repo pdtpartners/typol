@@ -3,7 +3,6 @@ from enum import Enum
 from typing import TYPE_CHECKING, Final
 
 import pytest
-
 import typol as tp
 from typol.types import EnumOf
 
@@ -320,3 +319,33 @@ def test_int_enum() -> None:
 
     row = next(players.iter_rows())
     assert row[Player.result] == 3
+
+
+class PersonAgeStats(tp.Shape):
+    age_group = tp.dimension(int)
+    names = tp.dimension(tp.list_of(str))
+
+
+@data_and_lazy
+def test_group_by_agg[F: _Frame](cls: F) -> None:
+    df = cls(
+        Person,
+        (
+            Person.age.set_all([25, 22, 35, 24, 35, 36]),
+            Person.name.set_all(["Alice", "Bob", "Charles", "David", "Eve", "Fred"]),
+        ),
+    )
+    assert df.group_by(Person.age // 10).agg(Person.name.str.join(", ")).sort(
+        Person.age
+    ).collect().to_dicts() == [
+        {"age": 2, "name": "Alice, Bob, David"},
+        {"age": 3, "name": "Charles, Eve, Fred"},
+    ]
+    assert df.group_by_transform(
+        PersonAgeStats, (Person.age // 10).to(PersonAgeStats.age_group)
+    ).agg(Person.name.agg().to(PersonAgeStats.names)).sort(
+        PersonAgeStats.age_group
+    ).collect().to_dicts() == [
+        {"age_group": 2, "names": ["Alice", "Bob", "David"]},
+        {"age_group": 3, "names": ["Charles", "Eve", "Fred"]},
+    ]
