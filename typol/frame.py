@@ -161,7 +161,34 @@ class DataFrame(Generic[_S_co]):
         return Series[T](self.dataframe[s.name])
 
     def head(self, n: int = 5) -> DataFrame[_S_co]:
+        """Take only the first `n` rows"""
         return DataFrame(self.shape, self.dataframe.head(n))
+
+    def tail(self, n: int = 5) -> DataFrame[_S_co]:
+        """Take only the last `n` rows"""
+        return DataFrame(self.shape, self.dataframe.tail(n))
+
+    def bottom_k(
+        self,
+        k: int,
+        *,
+        by: ExoExpr[_S_co, Any] | Collection[ExoExpr[_S_co, Any]],
+        reverse: bool = False,
+    ) -> DataFrame[_S_co]:
+        """Take only the smallest `k` rows, using `by` as the key"""
+        exprs = by.expr if isinstance(by, Expr) else [e.expr for e in by]
+        return DataFrame(self.shape, self.dataframe.bottom_k(k, by=exprs, reverse=reverse))
+
+    def top_k(
+        self,
+        k: int,
+        *,
+        by: ExoExpr[_S_co, Any] | Collection[ExoExpr[_S_co, Any]],
+        reverse: bool = False,
+    ) -> DataFrame[_S_co]:
+        """Take only the greatest `k` rows, using `by` as the key"""
+        exprs = by.expr if isinstance(by, Expr) else [e.expr for e in by]
+        return DataFrame(self.shape, self.dataframe.top_k(k, by=exprs, reverse=reverse))
 
     def slice(self, offset: int, length: int | None = None) -> DataFrame[_S_co]:
         return DataFrame(self.shape, self.dataframe.slice(offset, length))
@@ -384,12 +411,6 @@ class DataFrame(Generic[_S_co]):
         [see `expr.suffix`][typol.expr.suffix] for more info on shape suffixing
         """
         return self.lazy().suffix(suffixed).collect()
-
-    def gather_every(self, n: int, offset: int = 0) -> DataFrame[_S_co]:
-        return DataFrame(self.shape, self.dataframe.gather_every(n, offset))
-
-    def shift(self, n: int) -> DataFrame[_S_co]:
-        return DataFrame(self.shape, self.dataframe.shift(n))
 
     @overload
     def glimpse(self, *, return_type: Literal["string"]) -> str: ...
@@ -646,6 +667,74 @@ class DataFrame(Generic[_S_co]):
             Type of join to apply
         """
         return self.lazy().join(right.lazy(), *on, how=how).collect()
+
+    def sum(self) -> DataFrame[_S_co]:
+        """Sum all numeric columns in the frame, leaving other columns as null"""
+        return DataFrame(self.shape, self.dataframe.sum())
+
+    def mean(self) -> DataFrame[_S_co]:
+        """Take the mean of all numeric columns in the frame, leaving other columns as null"""
+        return DataFrame(self.shape, self.dataframe.mean())
+
+    def median(self) -> DataFrame[_S_co]:
+        """Take the median of all numeric columns in the frame, leaving other columns as null"""
+        return DataFrame(self.shape, self.dataframe.median())
+
+    def max(self) -> DataFrame[_S_co]:
+        """Take the maximum of all columns in the frame"""
+        return DataFrame(self.shape, self.dataframe.max())
+
+    def min(self) -> DataFrame[_S_co]:
+        """Take the minimum of all numeric columns in the frame"""
+        return DataFrame(self.shape, self.dataframe.min())
+
+    def var(self) -> DataFrame[_S_co]:
+        """
+        Take the variance value of all numeric columns in the frame, leaving all other columns as
+        null
+        """
+        return DataFrame(self.shape, self.dataframe.var())
+
+    def quantile(
+        self,
+        quantile: float,
+        interpolation: Literal[
+            "nearest", "higher", "lower", "midpoint", "linear", "equiprobable"
+        ] = "nearest",
+    ) -> DataFrame[_S_co]:
+        """
+        Take the `quantile`th (0.25, 0.75, etc.) value, using interpolation if there is no such
+        exact value
+        """
+        return DataFrame(self.shape, self.dataframe.quantile(quantile, interpolation=interpolation))
+
+    def shift(self, n: int) -> DataFrame[_S_co]:
+        """
+        Progress all rows in the frame n entries forward, so now the 0th is the nth. If negative
+        this would make the last one now the `length`-`n`th. Blank `null` rows will be inserted in
+        the introduced gaps, and rows at the end will fall off, being removed from the resultant
+        frame
+        """
+        return DataFrame(self.shape, self.dataframe.shift(n))
+
+    def gather(
+        self, indices: Series[int] | Sequence[int], *, null_on_oob: bool = False
+    ) -> DataFrame[_S_co]:
+        """For each index in the provided indices, take the row at that index"""
+        ix = indices.data if isinstance(indices, Series) else indices
+        return DataFrame(self.shape, self.dataframe.gather(ix, null_on_oob=null_on_oob))
+
+    def gather_every(self, n: int, offset: int = 0) -> DataFrame[_S_co]:
+        """Take each `n`th row from the frame, starting at `offset`"""
+        return DataFrame(self.shape, self.dataframe.gather_every(n, offset))
+
+    def interpolate(self) -> DataFrame[_S_co]:
+        """Fill in null values between set values with linear interpolations"""
+        return DataFrame(self.shape, self.dataframe.interpolate())
+
+    def limit(self, n: int = 5) -> DataFrame[_S_co]:
+        """Get the first `n` rows, alias for [head][typol.lazy.LazyFrame.head]"""
+        return self.head(n)
 
 
 @overload

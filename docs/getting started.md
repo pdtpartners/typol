@@ -316,7 +316,7 @@ Person.name.replace(nicknames)  # Expr[Person, Person, str]
 Person.phone_number.replace_out(region_name)  # Expr[Person, Never, str]
 ```
 
-You can use [`.to`][typol.expr.Expr.to] to bind these expressions to valid columns in a new shape
+You can use [`.to`](#to) to bind these expressions to valid columns in a new shape
 
 ```py
 Person.phone_number.replace_out(region_name).to(Region.name)  # Expr[Person, Region, str]

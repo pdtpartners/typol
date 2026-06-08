@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from collections.abc import Callable, Collection, Iterable, Mapping
+from collections.abc import Callable, Collection, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import (
     IO,
@@ -158,7 +158,34 @@ class LazyFrame(Generic[_S_co]):
         return self.__getitem__(s)
 
     def head(self, n: int = 5) -> LazyFrame[_S_co]:
+        """Take only the first `n` rows"""
         return LazyFrame(self.shape, self.dataframe.head(n))
+
+    def tail(self, n: int = 5) -> LazyFrame[_S_co]:
+        """Take only the last `n` rows"""
+        return LazyFrame(self.shape, self.dataframe.tail(n))
+
+    def bottom_k(
+        self,
+        k: int,
+        *,
+        by: ExoExpr[_S_co, Any] | Collection[ExoExpr[_S_co, Any]],
+        reverse: bool = False,
+    ) -> LazyFrame[_S_co]:
+        """Take only the smallest `k` rows, using `by` as the key"""
+        exprs = by.expr if isinstance(by, Expr) else [e.expr for e in by]
+        return LazyFrame(self.shape, self.dataframe.bottom_k(k, by=exprs, reverse=reverse))
+
+    def top_k(
+        self,
+        k: int,
+        *,
+        by: ExoExpr[_S_co, Any] | Collection[ExoExpr[_S_co, Any]],
+        reverse: bool = False,
+    ) -> LazyFrame[_S_co]:
+        """Take only the greatest `k` rows, using `by` as the key"""
+        exprs = by.expr if isinstance(by, Expr) else [e.expr for e in by]
+        return LazyFrame(self.shape, self.dataframe.top_k(k, by=exprs, reverse=reverse))
 
     def slice(self, offset: int, length: int | None = None) -> LazyFrame[_S_co]:
         return LazyFrame(self.shape, self.dataframe.slice(offset, length))
@@ -390,9 +417,6 @@ class LazyFrame(Generic[_S_co]):
         suffixed = suffixed or suffix(self.shape)
         return LazyFrame[Any](suffixed, self.dataframe.rename(suffixed.mapping_to()))
 
-    def gather_every(self, n: int, offset: int = 0) -> LazyFrame[_S_co]:
-        return LazyFrame(self.shape, self.dataframe.gather_every(n, offset))
-
     def pipe[**P, T](
         self, function: Callable[Concatenate[Self, P], T], *args: P.args, **kwargs: P.kwargs
     ) -> T:
@@ -538,6 +562,88 @@ class LazyFrame(Generic[_S_co]):
         else:
             joined = self.dataframe.join(right.dataframe, how=how)
         return LazyFrame["Intersection[_S_co, Q]"](self.shape & right.shape, joined)
+
+    def sum(self) -> LazyFrame[_S_co]:
+        """Sum all numeric columns in the frame, leaving other columns as null"""
+        return LazyFrame(self.shape, self.dataframe.sum())
+
+    def mean(self) -> LazyFrame[_S_co]:
+        """Take the mean of all numeric columns in the frame, leaving other columns as null"""
+        return LazyFrame(self.shape, self.dataframe.mean())
+
+    def median(self) -> LazyFrame[_S_co]:
+        """Take the median of all numeric columns in the frame, leaving other columns as null"""
+        return LazyFrame(self.shape, self.dataframe.median())
+
+    def max(self) -> LazyFrame[_S_co]:
+        """Take the maximum of all columns in the frame"""
+        return LazyFrame(self.shape, self.dataframe.max())
+
+    def min(self) -> LazyFrame[_S_co]:
+        """Take the minimum of all numeric columns in the frame"""
+        return LazyFrame(self.shape, self.dataframe.min())
+
+    def var(self) -> LazyFrame[_S_co]:
+        """
+        Take the variance value of all numeric columns in the frame, leaving all other columns as
+        null
+        """
+        return LazyFrame(self.shape, self.dataframe.var())
+
+    def quantile(
+        self,
+        quantile: float | ExoExpr[_S_co, float],
+        interpolation: Literal[
+            "nearest", "higher", "lower", "midpoint", "linear", "equiprobable"
+        ] = "nearest",
+    ) -> LazyFrame[_S_co]:
+        """
+        Take the `quantile`th (0.25, 0.75, etc.) value, using interpolation if there is no such
+        exact value
+        """
+        return LazyFrame(
+            self.shape,
+            self.dataframe.quantile(
+                quantile.expr if isinstance(quantile, Expr) else quantile,
+                interpolation=interpolation,
+            ),
+        )
+
+    def shift(self, n: int | ExoExpr[_S_co, int]) -> LazyFrame[_S_co]:
+        """
+        Progress all rows in the frame n entries forward, so now the 0th is the nth. If negative
+        this would make the last one now the `length`-`n`th. Blank `null` rows will be inserted in
+        the introduced gaps, and rows at the end will fall off, being removed from the resultant
+        frame
+        """
+        return LazyFrame(self.shape, self.dataframe.shift(n.expr if isinstance(n, Expr) else n))
+
+    def first(self) -> LazyFrame[_S_co]:
+        """Take the first row of the dataframe, the same as `.head(1)`"""
+        return LazyFrame(self.shape, self.dataframe.first())
+
+    def last(self) -> LazyFrame[_S_co]:
+        """Take the last row of the dataframe, the same as `.tail(1)`"""
+        return LazyFrame(self.shape, self.dataframe.last())
+
+    def gather(
+        self, indices: LazySeries[int] | Sequence[int], *, null_on_oob: bool = False
+    ) -> LazyFrame[_S_co]:
+        """For each index in the provided indices, take the row at that index"""
+        ix = indices.data if isinstance(indices, LazySeries) else indices
+        return LazyFrame(self.shape, self.dataframe.gather(ix, null_on_oob=null_on_oob))
+
+    def gather_every(self, n: int, offset: int = 0) -> LazyFrame[_S_co]:
+        """Take each `n`th row from the frame, starting at `offset`"""
+        return LazyFrame(self.shape, self.dataframe.gather_every(n, offset))
+
+    def interpolate(self) -> LazyFrame[_S_co]:
+        """Fill in null values between set values with linear interpolations"""
+        return LazyFrame(self.shape, self.dataframe.interpolate())
+
+    def limit(self, n: int = 5) -> LazyFrame[_S_co]:
+        """Get the first `n` rows, alias for [head][typol.lazy.LazyFrame.head]"""
+        return self.head(n)
 
 
 @dataclasses.dataclass
