@@ -1848,8 +1848,8 @@ def suffix[S: Shape](shape: type[S], suffix: str | None = None) -> type[Suffixed
     """
     Create a modified shape where each column name is suffixed:
 
-    ```
-    suffixed = external_accounts.suffix(suff := suffix(ExternalAccount))
+    ```py
+    suffixed = external_accounts.suffix(suff := tp.suffix(ExternalAccount))
     account_details = accounts.join(
         suffixed,
         Accounts.external_account_number.on(suff(ExternalAccounts.number))
@@ -1861,8 +1861,15 @@ def suffix[S: Shape](shape: type[S], suffix: str | None = None) -> type[Suffixed
     )
     ```
 
+    You do not need to use `tp.suffix` directly, you can instead rely on
+    [`DataFrame.suffix()`][typol.frame.DataFrame.suffix] and
+    [`LazyFrame.suffix()`][typol.lazy.LazyFrame.suffix]
+
     Parameters
     ----------
+    shape : type[S]
+        The base shape to suffix the columns of. The resultant suffixed shape will have the same
+        columns but with the suffixed appended
     suffix : str | None
         The string literal to append to each column name. If `None`, this will be the name of the
         shape itself

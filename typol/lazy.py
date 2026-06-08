@@ -127,13 +127,27 @@ class LazyFrame(Generic[_S_co]):
     @property
     def s(self) -> _S_co:
         """
-        Provides a utility alias for accessing dataframe shape columns and attributes
+        Provides a utility alias for accessing frame shape columns and attributes
 
-        As `Shape`s only have class-level operations, pretending this is an instance is equivalent
-        enough for direct usage of attributes (dimensions and `shape_meta`). To see the shape as a
-        shape-type, use `.shape`. This works around ty's limitation of resolving `Unknown` for
-        `type[S & Q]` (ty's fine with `type[S] & type[Q]`), by lowering to the instance level
+        ```
+        purchases.filter(purchases.s.price > 10) == purchases.filter(Purchase.price > 10)
+        ```
+
+        This is particularly useful when the shape has been constructed implicitly rather than is
+        explicitly defined:
+
+        ```
+        info = purchases.join(customers, Purchase.customer.on(Customer.name))
+        info.filter(info.s.age > 20)  # `.s` here refers to `Purchase & Customer`
+
+        suffixed = customer.suffix()
+        suffixed.filter(suffixed.s(Customer.name) == "Samwise")  # `.s` is `Suffixed[Customer]`
+        ```
         """
+        # As `Shape`s only have class-level operations, pretending this is an instance is equivalent
+        # enough for direct usage of attributes (dimensions and `shape_meta`). To see the shape as a
+        # shape-type, use `.shape`. This works around ty's limitation of resolving `Unknown` for
+        # `type[S & Q]` (ty's fine with `type[S] & type[Q]`), by lowering to the instance level
         return cast(_S_co, self.shape)
 
     def __getitem__[T](self, s: ExoExpr[_S_co, T]) -> LazySeries[T]:
@@ -163,7 +177,18 @@ class LazyFrame(Generic[_S_co]):
         return LazyFrame(self.shape, self.dataframe.filter(*(c.expr for c in condition)))
 
     def with_columns(self, *columns: EndoExpr[_S_co, Any]) -> LazyFrame[_S_co]:
-        """Use the provided expressions to update existing columns in the shape"""
+        """
+        Use the provided expressions to update existing columns in the shape:
+
+        ```py
+        customers.with_columns(
+            customers.s.age + 1,  # Add one to their age
+            customers.s.name.fill_null(customers.s.phone)  # Use their phone number as a backup name
+        )
+        ```
+
+        If adding or dropping columns, use [`transform`][typol.lazy.LazyFrame.transform] instead
+        """
         return LazyFrame(self.shape, self.dataframe.with_columns(c.expr for c in columns))
 
     def transform[SNew: Shape](
@@ -173,11 +198,22 @@ class LazyFrame(Generic[_S_co]):
         Convert from one shape to another shape, using the provided expressions to map columns in
         the current shape to columns in the new shape:
 
+        ```py
+        # Transform also acts like a select, picking all `Person` columns from a `Customer`
+        customers.transform(Person)
+        # You can map any Customer column to any Person column in the meantime
+        customers.transform(Person, customers.s.name.str.strip_chars(), customers.s.age + 1)
+        # Don't use transform when staying within the same shape, just use with_columns
+        customers.with_columns(customers.s.name.str.strip_chars(), customers.s.age + 1)
+        ```
+
         - Any columns with the same name in both the current and new shapes without an expression
           mapping to them will be preserved
         - Any columns in the new shape not in the original shape, and not mapped to, will throw a
           runtime error
         - Any columns in the current shape not in the new shape will be dropped
+
+        See [with_columns][typol.lazy.LazyFrame.with_columns] when not changing between shapes
         """
         return LazyFrame(shape, self.dataframe.with_columns(t.expr for t in transforms))
 
@@ -319,6 +355,38 @@ class LazyFrame(Generic[_S_co]):
         )
 
     def suffix(self, suffixed: type[Suffixed[_S_co]] | None = None) -> LazyFrame[Suffixed[_S_co]]:
+        """
+        Suffix the columns of the shape to distinguish them from conflicts with other shape column
+        names, retyping the dataframe as `Suffixed[CurrentShape]`:
+
+        ```
+        suffixed = customer.suffix()  # type: tp.LazyFrame[Suffixed[Customer]]
+        ```
+
+        Suffixed shapes cannot have their fields accessed directly, instead must be accessed through
+        projecting the dimensions via the suffixed shape:
+
+        ```
+        # Note, suffixed.s(...) converts an original `Customer` dimension into a suffixed dimension
+        suffixed[suffixed.s(Customer.name)].collect().to_list()
+        ```
+
+        This is most useful in joint/intersection shapes, or self-joins:
+
+        ```
+        # Add a suffix to all the columns so they can be referred to independently
+        other_customers = customers.suffix()
+        # Join customers against itself to find ones where the names conflict
+        customers_with_the_same_name = customers.join(
+            other_customers,
+            # To refer to suffixed columns, do suffixed_shape(original_column)
+            customers.s.name.on(other_customers.s(Customer.name))
+            how="cross"
+        ).filter(customer.s.phone != other_customers.s(Customer.phone))
+        ```
+
+        [see `expr.suffix`][typol.expr.suffix] for more info on shape suffixing
+        """
         suffixed = suffixed or suffix(self.shape)
         return LazyFrame[Any](suffixed, self.dataframe.rename(suffixed.mapping_to()))
 
@@ -414,14 +482,40 @@ class LazyFrame(Generic[_S_co]):
         how: Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"] = "inner",
     ) -> LazyFrame[Intersection[_S_co, Q]]:
         """
-        Join two tables into a common shape. The common shape must be a subclass of both original
-        tables. To avoid creating the common subclass use `.join_transform(...)`
+        Join two tables into a common shape, the intersection of the two provided shapes:
+
+        ```
+        customers.join(
+            purchases,
+            customers.s.name.on(purchases.s.customer),
+            customers.s.phone.on(purchases.s.billing_phone),
+        )  # resultant frame of type Customer & Purchase
+        ```
+
+        If there are conflicting columns, Polars will not be able to distinguish the results.
+        Explicitly distinguish two shapes with `df.suffix()`, particularly important for self-joins:
+
+        ```
+        # Add a suffix to all the columns so they can be referred to independently
+        other_customers = customers.suffix()
+        # Join customers against itself to find ones where the names conflict
+        customers_with_the_same_name = customers.join(
+            other_customers,
+            # To refer to suffixed columns, do suffixed_shape(original_column)
+            customers.s.name.on(other_customers.s(Customer.name))
+            how="cross"
+        ).filter(customer.s.phone != other_customers.s(Customer.phone))
+        ```
+
+        [see `LazyFrame.suffix`][typol.lazy.LazyFrame.suffix]
 
         Parameters
         ----------
         on : BoundDimension[S, _]
             Join on the same columns for the left and the right shapes based on the joint shape.
             The column must be available in both original shapes
+        how : Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"]
+            Type of join to apply
         """
         if on:
             joined = self.dataframe.join(

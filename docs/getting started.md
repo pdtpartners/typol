@@ -255,6 +255,73 @@ purchases.write_csv_of(
 
 Apart from the obvious `tp.Shape` differences, here are a couple things you should be aware of coming from Polars
 
+### Expression targets
+
+Polars expressions have names, which you can set with `.alias`. In Typol, these targets are associated with shapes, i.e.
+
+```py
+# This expression is read from a `Customer`, targets a `Customer`, and is a `str`
+Customer.name  # Expr[Customer, Customer, str]
+# This expression is read from a `Customer`, targets a `Purchase`, and is an int`
+(tp.lit(2026) - Purchase.age).to(Customer.year_of_birth)  # Expr[Customer, Purchase, int]
+```
+
+When expressions change type, they are no longer valid for their original shape:
+
+```py
+# This expression is read from a `Customer`, but there is no longer valid for a shape, and is a `bool`
+Purchase.age > 21  # Expr[Purchase, Never, bool]
+```
+
+This is fine in some situations, like filtering, where the output is not written to a shape. Note, only the leftmost expression is used for a name, so if an expression is combined with others which are valid for a shape, then it doesn't matter that it itself has lost its shape:
+
+```py
+# Filtering doesn't write to a column, so the output doesn't need to be valid for the original shape
+df.filter(Purchase.age > 21)
+# The left expression already gives it a valid `bool` column name (`is_legal`), so the overall expression is ok to write to `Purchase`
+df.with_columns(Purchase.is_legal & (Purchase.age > 21))
+# This is ok, since Purchase.name is valid for a `str`, so it doesn't matter than the casted phone number isn't valid for its shape
+df.with_columns(Purchase.name.fill_null(Purchase.phone_number.cast_out(str)))
+```
+
+If an expression has lost its shape, you can use `to` to reassociate it with a valid column
+
+```py
+# (Purchase.age > 21) is a boolean so is not valid for `age`, but it's total appropriate for `is_legal`
+df.with_columns((Purchase.age > 21).to(Purchase.is_legal))
+# The left expression here has lost its shape thanks to being casted from an int to a str, so we reassociate it with a valid str column
+df.with_columns(Purchase.phone_number.cast_out(str).fill_null(Purchase.name).to(Purchase.name))
+```
+
+#### `to`
+
+Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, `.alias` is simply called `.to` in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.
+
+```py
+# Polars
+(pl.col.age + 1).alias("age_next_year")
+
+# Typol
+(person.s.age + 1).to(FuturePerson.age_next_year)
+```
+
+#### `*_out`
+
+Some methods end with `_out`, i.e. `map_out` and `replace_out`. These are variants of the core methods that lose their shape:
+
+```
+# Doesn't need to lose its shape since it stays a string in the name column
+Person.name.replace(nicknames)  # Expr[Person, Person, str]
+# Loses its shape (i.e. goes to `Never`) since if `phone_number = tp.dimension(int)`, it cannot contain a string
+Person.phone_number.replace_out(region_name)  # Expr[Person, Never, str]
+```
+
+You can use [`.to`][typol.expr.Expr.to] to bind these expressions to valid columns in a new shape
+
+```py
+Person.phone_number.replace_out(region_name).to(Region.name)  # Expr[Person, Region, str]
+```
+
 ### `transform`
 
 In Polars we use select and with_columns, in Typol we need to be explicit about which shape we're going to, so `transform` fills the role of these. `with_columns` is still helpful when no new columns are being added.
@@ -276,14 +343,20 @@ customers.transform(Person, customers.s.name.str.strip_chars(), customers.s.age 
 customers.with_columns(customers.s.name.str.strip_chars(), customers.s.age + 1)
 ```
 
-### `to`
+#### `*_transform` helpers
 
-Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, `.alias` is simply called `.to` in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.
+Some operations are more ergonomic when you can switch between shapes and transform values at the same time. For example, an aggregation is likely to need different columns than the original data, potentially dropping columns or creating list columns:
 
 ```py
-# Polars
-(pl.col.age + 1).alias("age_next_year")
+class AgesOfNames(tp.Shape):
+    name = tp.dimension(str)
+    ages = tp.dimension(tp.list_of(str))
 
-# Typol
-(person.s.age + 1).to(FuturePerson.age_next_year)
+
+name_stats = people.group_by_transform(
+    AgesOfNames, 
+    people.s.name.to(AgesOfNames.name)
+).agg(people.s.ages.agg().to(AgesOfNames.ages))
 ```
+
+This avoids having to have awkward states, i.e. using strings to represent lists or singleton lists before aggregation, and can avoid having more intermediate shapes
