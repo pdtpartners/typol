@@ -1096,7 +1096,7 @@
 </span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a># Loses its shape (i.e. goes to `Never`) since if `phone_number = tp.dimension(int)`, it cannot contain a string
 </span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>Person.phone_number.replace_out(region_name)  # Expr[Person, Never, str]
 </span></code></pre></div>
-<p>You can use [<code>.to</code>][typol.expr.Expr.to] to bind these expressions to valid columns in a new shape</p>
+<p>You can use <a href="#to"><code>.to</code></a> to bind these expressions to valid columns in a new shape</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">Person</span><span class="o">.</span><span class="n">phone_number</span><span class="o">.</span><span class="n">replace_out</span><span class="p">(</span><span class="n">region_name</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Region</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># Expr[Person, Region, str]</span>
 </span></code></pre></div>
 <h3 id="transform"><code>transform</code></h3>
