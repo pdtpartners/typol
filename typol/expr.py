@@ -222,13 +222,6 @@ class AggExpr[S: Shape, R: Shape, T]:
     def null_when_eq(self, value: ExoAggExpr[S, T] | T) -> AggExpr[S, R, T]:
         return AggExpr(pl.when(self.expr.ne(_pl_expr(value))).then(self.expr))
 
-    def null_insignificant[N: (float, int)](self: AggExpr[S, R, N]) -> AggExpr[S, R, N]:
-        return AggExpr(
-            pl.when(self.expr.is_not_nan(), self.expr.is_not_null(), self.expr.ne(0)).then(
-                self.expr
-            )
-        )
-
     def to[Q: Shape](self, dimension: BoundDimension[Q, T]) -> AggExpr[S, Q, T]:
         # We don't cast here in case it's an `agg`; Polars has weird casting behaviour with
         # this and there's no way to tell Polars is this to be aggregated
@@ -948,12 +941,6 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     ) -> MesoExpr[_S_contra, bool]:
         return IntermediateExpr(self.expr.is_finite())
 
-    def is_significant[N: (int, float)](
-        self: Expr[_S_contra, _R_contra, N],
-    ) -> MesoExpr[_S_contra, bool]:
-        """Is the numeric value a significant number, not `nan`, `0` or `null`"""
-        return IntermediateExpr(self.expr.is_not_nan() & self.expr.is_not_null() & self.expr.ne(0))
-
     def not_(self: Expr[_S_contra, _R_contra, bool]) -> Expr[_S_contra, _R_contra, bool]:
         return IntermediateExpr(self.expr.not_())
 
@@ -989,6 +976,13 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         return IntermediateExpr(
             self.expr.fill_null(_pl_expr(fill) if fill is not None else None, strategy)
         )
+
+    def backward_fill(self) -> Expr[_S_contra, _R_contra, _T]:
+        """
+        Fill nulls with the next non-null value, this is an alias for
+        [`fill_null(strategy="backward")][typol.expr.Expr.fill_null]
+        """
+        return IntermediateExpr(self.expr.backward_fill())
 
     def fill_nan[SA: Shape](
         self, fill: ExoExpr[SA, _T] | _T | None
@@ -1418,10 +1412,6 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         """Replace any value equalling `expr` with null. E.g. `.null_when_eq("NOT SET")`"""
         return when(self.eq(expr)).otherwise(self)
 
-    def null_insignificant(self) -> Expr[_S_contra, _R_contra, _T]:
-        """Replace 0 and `nan` with null"""
-        return when(self.is_significant()).then(self)
-
     def max_horizontal[SA: Shape](
         self, *others: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]:
@@ -1472,6 +1462,83 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def on(self, other: ExoExpr | None = None) -> JoinOn:
         return JoinOn(self, other if other is not None else self)
+
+    def all(
+        self: Expr[_S_contra, _R_contra, bool], *, ignore_nulls: bool = True
+    ) -> AggExpr[_S_contra, _R_contra, bool]:
+        """Are all values in the column true?"""
+        return AggExpr(self.expr.all(ignore_nulls=ignore_nulls))
+
+    def any(
+        self: Expr[_S_contra, _R_contra, bool], *, ignore_nulls: bool = True
+    ) -> AggExpr[_S_contra, _R_contra, bool]:
+        """Are any values in the column true?"""
+        return AggExpr(self.expr.any(ignore_nulls=ignore_nulls))
+
+    def approx_n_unique(self) -> MesoExpr[_S_contra, int]:
+        """Approximate count of the number of distinct values of the expression"""
+        return IntermediateExpr(self.expr.approx_n_unique())
+
+    def arccos[N: (float, Decimal)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        """Calculate inverse cosine for each value in the column"""
+        return IntermediateExpr(self.expr.arccos())
+
+    def arccosh[N: (float, Decimal)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        """Calculate inverse hyperbolic cosine for each value in the column"""
+        return IntermediateExpr(self.expr.arccosh())
+
+    def arctan[N: (float, Decimal)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        """Calculate inverse tangent for each value in the column"""
+        return IntermediateExpr(self.expr.arctan())
+
+    def arctanh[N: (float, Decimal)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        """Calculate inverse hyperbolic tangent for each value in the column"""
+        return IntermediateExpr(self.expr.arctanh())
+
+    def arcsin[N: (float, Decimal)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        """Calculate inverse sine for each value in the column"""
+        return IntermediateExpr(self.expr.arcsin())
+
+    def arcsinh[N: (float, Decimal)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        """Calculate inverse hyperbolic sine for each value in the column"""
+        return IntermediateExpr(self.expr.arcsinh())
+
+    def arg_max(self) -> MesoAggExpr[_S_contra, int]:
+        """The index of the maximal value"""
+        return AggExpr(self.expr.arg_max())
+
+    def arg_min(self) -> MesoAggExpr[_S_contra, int]:
+        """The index of the minimal value"""
+        return AggExpr(self.expr.arg_min())
+
+    def arg_sort(
+        self, *, descending: bool = False, nulls_last: bool = False
+    ) -> MesoExpr[_S_contra, int]:
+        """
+        Get the indices that would sort this column. With `.gather`, this could be used to sort
+        rows
+        """
+        return IntermediateExpr(self.expr.arg_sort(descending=descending, nulls_last=nulls_last))
+
+    def arg_true(self: Expr[_S_contra, _R_contra, bool]) -> MesoExpr[_S_contra, int]:
+        """Indices where the expression evaluates to true"""
+        return IntermediateExpr(self.expr.arg_true())
+
+    def arg_unique(self) -> MesoExpr[_S_contra, int]:
+        """The indices of the first unique values"""
+        return IntermediateExpr(self.expr.arg_unique())
 
 
 # An expression that is local to a shape
