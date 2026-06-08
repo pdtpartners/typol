@@ -408,15 +408,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#transform" class="md-nav__link">
+  <a href="#expression-targets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform
+        Expression targets
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Expression targets">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#to" class="md-nav__link">
@@ -426,6 +427,50 @@
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        *_out
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="transform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_transform-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        *_transform helpers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -727,15 +772,16 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#transform" class="md-nav__link">
+  <a href="#expression-targets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        transform
+        Expression targets
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Expression targets">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#to" class="md-nav__link">
@@ -745,6 +791,50 @@
       
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_out" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        *_out
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transform
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="transform">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_transform-helpers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        *_transform helpers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -966,31 +1056,79 @@
 </span></code></pre></div>
 <h2 id="concepts-that-are-different-to-polars">Concepts that are different to Polars</h2>
 <p>Apart from the obvious <code>tp.Shape</code> differences, here are a couple things you should be aware of coming from Polars</p>
+<h3 id="expression-targets">Expression targets</h3>
+<p>Polars expressions have names, which you can set with <code>.alias</code>. In Typol, these targets are associated with shapes, i.e.</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># This expression is read from a `Customer`, targets a `Customer`, and is a `str`</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">Customer</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># Expr[Customer, Customer, str]</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="c1"># This expression is read from a `Customer`, targets a `Purchase`, and is an int`</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">lit</span><span class="p">(</span><span class="mi">2026</span><span class="p">)</span> <span class="o">-</span> <span class="n">Purchase</span><span class="o">.</span><span class="n">age</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Customer</span><span class="o">.</span><span class="n">year_of_birth</span><span class="p">)</span>  <span class="c1"># Expr[Customer, Purchase, int]</span>
+</span></code></pre></div>
+<p>When expressions change type, they are no longer valid for their original shape:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># This expression is read from a `Customer`, but there is no longer valid for a shape, and is a `bool`</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">Purchase</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">21</span>  <span class="c1"># Expr[Purchase, Never, bool]</span>
+</span></code></pre></div>
+<p>This is fine in some situations, like filtering, where the output is not written to a shape. Note, only the leftmost expression is used for a name, so if an expression is combined with others which are valid for a shape, then it doesn't matter that it itself has lost its shape:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Filtering doesn&#39;t write to a column, so the output doesn&#39;t need to be valid for the original shape</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">21</span><span class="p">)</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="c1"># The left expression already gives it a valid `bool` column name (`is_legal`), so the overall expression is ok to write to `Purchase`</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">is_legal</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">21</span><span class="p">))</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="c1"># This is ok, since Purchase.name is valid for a `str`, so it doesn&#39;t matter than the casted phone number isn&#39;t valid for its shape</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">fill_null</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">phone_number</span><span class="o">.</span><span class="n">cast_out</span><span class="p">(</span><span class="nb">str</span><span class="p">)))</span>
+</span></code></pre></div>
+<p>If an expression has lost its shape, you can use <code>to</code> to reassociate it with a valid column</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># (Purchase.age &gt; 21) is a boolean so is not valid for `age`, but it&#39;s total appropriate for `is_legal`</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">((</span><span class="n">Purchase</span><span class="o">.</span><span class="n">age</span> <span class="o">&gt;</span> <span class="mi">21</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">is_legal</span><span class="p">))</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="c1"># The left expression here has lost its shape thanks to being casted from an int to a str, so we reassociate it with a valid str column</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">phone_number</span><span class="o">.</span><span class="n">cast_out</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">fill_null</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Purchase</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+</span></code></pre></div>
+<h4 id="to"><code>to</code></h4>
+<p>Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, <code>.alias</code> is simply called <code>.to</code> in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Polars</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;age_next_year&quot;</span><span class="p">)</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="c1"># Typol</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">(</span><span class="n">person</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">FuturePerson</span><span class="o">.</span><span class="n">age_next_year</span><span class="p">)</span>
+</span></code></pre></div>
+<h4 id="_out"><code>*_out</code></h4>
+<p>Some methods end with <code>_out</code>, i.e. <code>map_out</code> and <code>replace_out</code>. These are variants of the core methods that lose their shape:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a># Doesn&#39;t need to lose its shape since it stays a string in the name column
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>Person.name.replace(nicknames)  # Expr[Person, Person, str]
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a># Loses its shape (i.e. goes to `Never`) since if `phone_number = tp.dimension(int)`, it cannot contain a string
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>Person.phone_number.replace_out(region_name)  # Expr[Person, Never, str]
+</span></code></pre></div>
+<p>You can use [<code>.to</code>][typol.expr.Expr.to] to bind these expressions to valid columns in a new shape</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">Person</span><span class="o">.</span><span class="n">phone_number</span><span class="o">.</span><span class="n">replace_out</span><span class="p">(</span><span class="n">region_name</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">Region</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># Expr[Person, Region, str]</span>
+</span></code></pre></div>
 <h3 id="transform"><code>transform</code></h3>
 <p>In Polars we use select and with_columns, in Typol we need to be explicit about which shape we're going to, so <code>transform</code> fills the role of these. <code>with_columns</code> is still helpful when no new columns are being added.</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Polars</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="c1"># Typol</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>    <span class="n">age</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>
-</span><span id="__span-19-11"><a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="c1"># Typol will always select all available columns</span>
-</span><span id="__span-19-12"><a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span>
-</span><span id="__span-19-13"><a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-19-14"><a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1"># Polars</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span><span class="p">)</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">customers</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="c1"># Typol</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a>    <span class="n">age</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>
+</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="c1"># Typol will always select all available columns</span>
+</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span>
+</span><span id="__span-26-13"><a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="n">customers</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">Person</span><span class="p">,</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-26-14"><a id="__codelineno-26-14" name="__codelineno-26-14" href="#__codelineno-26-14"></a><span class="n">customers</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip_chars</span><span class="p">(),</span> <span class="n">customers</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 </span></code></pre></div>
-<h3 id="to"><code>to</code></h3>
-<p>Relabelling columns is quite important in Typol, since shapes are fixed and intermediate expressions need to be repointed to a column in the resultant shape. For this reason, <code>.alias</code> is simply called <code>.to</code> in Typol, to be concise and make it clear we're not creating another name for it, rather matching it to which column it should end up in.</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Polars</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;age_next_year&quot;</span><span class="p">)</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># Typol</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">(</span><span class="n">person</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">age</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">FuturePerson</span><span class="o">.</span><span class="n">age_next_year</span><span class="p">)</span>
+<h4 id="_transform-helpers"><code>*_transform</code> helpers</h4>
+<p>Some operations are more ergonomic when you can switch between shapes and transform values at the same time. For example, an aggregation is likely to need different columns than the original data, potentially dropping columns or creating list columns:</p>
+<div class="language-py highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">AgesOfNames</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">Shape</span><span class="p">):</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    <span class="n">name</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>    <span class="n">ages</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">dimension</span><span class="p">(</span><span class="n">tp</span><span class="o">.</span><span class="n">list_of</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="n">name_stats</span> <span class="o">=</span> <span class="n">people</span><span class="o">.</span><span class="n">group_by_transform</span><span class="p">(</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>    <span class="n">AgesOfNames</span><span class="p">,</span> 
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>    <span class="n">people</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">AgesOfNames</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="__span-27-9"><a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">people</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">ages</span><span class="o">.</span><span class="n">agg</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">AgesOfNames</span><span class="o">.</span><span class="n">ages</span><span class="p">))</span>
 </span></code></pre></div>
+<p>This avoids having to have awkward states, i.e. using strings to represent lists or singleton lists before aggregation, and can avoid having more intermediate shapes</p>
 
 
 
