@@ -85,7 +85,7 @@ class Row[S: Shape](Mapping[str, Any]):
     @overload
     def get[T, U](self, dim: BoundDimension[S, T] | str, default: U) -> T | U: ...
 
-    def get[U](self, dim: BoundDimension[S, Any] | str, *args: U, **kwargs: U) -> object | U:
+    def get[U](self, dim: BoundDimension[S, Any] | str, *args: U, **kwargs: U) -> object:  # ty: ignore[invalid-method-override]
         """
         Retrieve column from row, returning `None` or `default=` if the column is unset (i.e. null)
         for this row. To avoid handling `None`s, use `row[Shape.col]`, although note that will raise

@@ -196,7 +196,7 @@ class LazyFrame(Generic[_S_co]):
     def collect(
         self, engine: Literal["auto", "in-memory", "streaming", "gpu"] = "auto"
     ) -> DataFrame[_S_co]:
-        df = cast(pl.DataFrame, self.dataframe.collect(engine=engine, background=False))
+        df = self.dataframe.collect(engine=engine, background=False)
         return DataFrame(self.shape, df)
 
     def filter(self, *condition: ExoExpr[_S_co, bool]) -> LazyFrame[_S_co]:

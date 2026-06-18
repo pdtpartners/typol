@@ -236,8 +236,8 @@ class BoundSeries[S: Shape, T]:
 
 
 def _collect(lf: pl.LazyFrame) -> pl.Series:
-    return cast(pl.DataFrame, lf.collect())["series"]
+    return lf.collect()["series"]
 
 
 def _collect_val(lf: pl.LazyFrame) -> Any | None:  # noqa: ANN401
-    return cast(pl.DataFrame, lf.collect())["series"].first()
+    return lf.collect()["series"].first()

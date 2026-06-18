@@ -541,12 +541,11 @@ class DataFrame(Generic[_S_co]):
         if isinstance(mappings, Sequence):
             dataframe = dataframe.select(c.name for c in mappings)
         elif isinstance(mappings, Mapping):
-            dataframe = cast(
-                pl.DataFrame,
+            dataframe = (
                 dataframe.lazy()
                 .rename({d.name: h for d, h in mappings.items()})
                 .select(mappings.values())
-                .collect(background=False),
+                .collect(background=False)
             )
 
         return dataframe.write_csv(
