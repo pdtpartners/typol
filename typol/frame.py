@@ -11,6 +11,7 @@ from typing import (
     Concatenate,
     Generic,
     Literal,
+    LiteralString,
     Self,
     TypeAlias,
     TypeVar,
@@ -25,6 +26,8 @@ from polars.interchange.dataframe import PolarsDataFrame
 
 from typol.expr import (
     AggExpr,
+    Alias,
+    AliasShape,
     BoundDimension,
     ColumnInitializer,
     EndoAggExpr,
@@ -38,7 +41,7 @@ from typol.expr import (
     Suffixed,
 )
 from typol.row import Row
-from typol.series import BoundSeries, Series
+from typol.series import Series
 
 if TYPE_CHECKING:
     from ty_extensions import Intersection
@@ -206,9 +209,16 @@ class DataFrame(Generic[_S_co]):
         """Only keep rows where the boolean conditions evaluate to `True`"""
         return DataFrame(self.shape, self.dataframe.filter(*(c.expr for c in condition)))
 
-    def with_columns(
-        self, *columns: EndoExpr[_S_co, Any] | BoundSeries[_S_co, Any]
-    ) -> DataFrame[_S_co]:
+    @overload
+    def with_columns(self, *columns: EndoExpr[_S_co, Any]) -> DataFrame[_S_co]: ...
+    @overload
+    def with_columns[A: LiteralString, AT](
+        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+    ) -> DataFrame[Intersection[_S_co, AliasShape[A, AT]]]: ...
+
+    def with_columns[A: LiteralString, AT](
+        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+    ) -> DataFrame[Intersection[_S_co, AliasShape[A, AT]]]:
         """
         Use the provided expressions to update existing columns in the shape:
 
@@ -221,7 +231,7 @@ class DataFrame(Generic[_S_co]):
 
         If adding or dropping columns, use [`transform`][typol.frame.DataFrame.transform] instead
         """
-        return DataFrame(self.shape, self.dataframe.with_columns(c.expr for c in columns))
+        return self.lazy().with_columns(*columns).collect()
 
     def transform[SNew: Shape](
         self, shape: type[SNew], *transforms: Expr[_S_co, SNew, Any]

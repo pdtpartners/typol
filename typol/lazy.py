@@ -11,6 +11,7 @@ from typing import (
     Concatenate,
     Generic,
     Literal,
+    LiteralString,
     Self,
     TypeVar,
     assert_never,
@@ -25,6 +26,8 @@ from more_itertools import first, prepend
 
 from typol.expr import (
     AggExpr,
+    Alias,
+    AliasShape,
     BoundDimension,
     ColumnInitializer,
     EndoAggExpr,
@@ -203,7 +206,16 @@ class LazyFrame(Generic[_S_co]):
         """Only keep rows where the boolean conditions evaluate to `True`"""
         return LazyFrame(self.shape, self.dataframe.filter(*(c.expr for c in condition)))
 
-    def with_columns(self, *columns: EndoExpr[_S_co, Any]) -> LazyFrame[_S_co]:
+    @overload
+    def with_columns(self, *columns: EndoExpr[_S_co, Any]) -> LazyFrame[_S_co]: ...
+    @overload
+    def with_columns[A: LiteralString, AT](
+        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+    ) -> LazyFrame[Intersection[_S_co, AliasShape[A, AT]]]: ...
+
+    def with_columns[A: LiteralString, AT](
+        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+    ) -> LazyFrame[Intersection[_S_co, AliasShape[A, AT]]]:
         """
         Use the provided expressions to update existing columns in the shape:
 
@@ -216,7 +228,12 @@ class LazyFrame(Generic[_S_co]):
 
         If adding or dropping columns, use [`transform`][typol.lazy.LazyFrame.transform] instead
         """
-        return LazyFrame(self.shape, self.dataframe.with_columns(c.expr for c in columns))
+        df = self.dataframe.with_columns(c.expr for c in columns)
+        shape = self.shape
+        for column in columns:
+            if isinstance(column, Alias):
+                shape &= column.construct_shape(df)
+        return LazyFrame(shape, df)
 
     def transform[SNew: Shape](
         self, shape: type[SNew], *transforms: Expr[_S_co, SNew, Any] | BoundSeries[SNew, Any]

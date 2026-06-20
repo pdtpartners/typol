@@ -69,7 +69,18 @@ You can also update columns in the same shape:
 accounts.with_columns(accounts.s.name.str.to_lowercase())
 ```
 
-which will have lowercased names. If you change type, it won't be assignable to the same column:
+which will have lowercased names, or you can add a column to a shape:
+
+```python
+accounts_with_emails = accounts.with_columns(
+    (accounts.s.name.str.to_lowercase() + "@" + accounts.s.website).alias("email")
+)
+# It tracks your added column name and reveal the correct type:
+reveal_type(accounts_with_emails.s.email)  # Revealed type is `BoundDimension[..., str]`
+```
+
+
+If you change type, it won't be assignable to the same column:
 
 ```python
 # `.uid.cast_out(str)` can't be left in `.uid` if cast to a str

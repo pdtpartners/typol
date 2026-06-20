@@ -15,6 +15,7 @@ from typing import (
     ClassVar,
     Generic,
     Literal,
+    LiteralString,
     Never,
     Self,
     TypeAlias,
@@ -170,6 +171,40 @@ class Dimension[T]:
     def __set_name__(self, _owner: type, name: str) -> None:
         if not self.name:
             object.__setattr__(self, "name", name)
+
+
+class AliasShape[A: str, T](Shape):
+    if TYPE_CHECKING:
+
+        def __getattr__(self, name: A, /) -> BoundDimension[Self, T]:
+            raise NotImplementedError
+
+
+_A = TypeVar("_A", bound=LiteralString)
+_S_contra = TypeVar("_S_contra", bound="Shape", contravariant=True)
+_R_contra = TypeVar("_R_contra", bound="Shape", contravariant=True)
+_T = TypeVar("_T")
+
+
+@dataclasses.dataclass(frozen=True)
+class Alias(Generic[_S_contra, _A, _T]):
+    name: str
+    source_expr: ExoExpr[_S_contra, _T]
+
+    def construct_shape(
+        self, context: pl.Schema | pl.DataFrame | pl.LazyFrame
+    ) -> type[AliasShape[_A, _T]]:
+        pl_ty = pl.dtype_of(self.expr).collect_dtype(context)
+        ty = Type(pl_ty.to_python(), pl_ty)
+
+        class _AliasShape(AliasShape): ...
+
+        setattr(_AliasShape, self.name, Dimension(ty, self.name))
+        return _AliasShape
+
+    @property
+    def expr(self) -> pl.Expr:
+        return self.source_expr.expr.alias(self.name)
 
 
 def dimension[T](ty: Typeable[T], name: str = "") -> Dimension[T]:
@@ -805,11 +840,6 @@ class StructExprNamespace[S: Shape, R: Shape, M: Shape]:
         return self.expr.map_to(lambda x: transform(Row.from_struct_mapping(x)), to)
 
 
-_S_contra = TypeVar("_S_contra", bound="Shape", contravariant=True)
-_R_contra = TypeVar("_R_contra", bound="Shape", contravariant=True)
-_T = TypeVar("_T")
-
-
 @dataclasses.dataclass(frozen=True)
 class Explosion(Generic[_S_contra, _R_contra, _T]):
     """An expression that can "explode" a frame to a new row for each output value"""
@@ -995,13 +1025,31 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def to[Q: Shape](self, dimension: BoundDimension[Q, _T]) -> Expr[_S_contra, Q, _T]:
         return IntermediateExpr(self.expr.alias(dimension.name).cast(dimension.ty.pl_ty))
 
-    def to_out(self, label: builtins.str) -> Expr[_S_contra, Shape, _T]:
+    def to_out(self, label: builtins.str) -> Expr[_S_contra, Never, _T]:
         """
         The _out variant of `to` lets you rename a column, but it must be renamed again before it
         can be stored in a shape. However, if you're  going out to a file, this controls the output
         column name, so is most useful with `transform_write_csv`
         """
         return IntermediateExpr(self.expr.alias(label))
+
+    def alias[A: LiteralString](self, label: A) -> Alias[_S_contra, A, _T]:
+        """
+        Extend the shape with an extra column. This can be used in `.with_columns(...)` much like in
+        Polars, to add more columns to the shape:
+
+        ```python
+        class Name:
+            first = tp.dimension(str)
+            last = tp.dimension(str)
+
+        names_with_lengths = names.with_columns(
+            (names.s.first.str.len_chars() + names.s.last.len_chars()).alias("length")
+        )
+        longest_length = names_with_lengths[names_with_lengths.s.length].max()
+        ```
+        """
+        return Alias(label, self)
 
     def agg(self) -> MesoAggExpr[_S_contra, builtins.list[_T]]:
         """Collect all values in the given group into a list"""

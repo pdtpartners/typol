@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable
 from enum import Enum
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Literal
 
 import pytest
 import typol as tp
@@ -349,3 +349,52 @@ def test_group_by_agg[F: _Frame](cls: F) -> None:
         {"age_group": 2, "names": ["Alice", "Bob", "David"]},
         {"age_group": 3, "names": ["Charles", "Eve", "Fred"]},
     ]
+
+
+def test_alias() -> None:
+    df = tp.LazyFrame(
+        Person,
+        (
+            Person.age.set_all([25, 22, 35, 24, 35, 36]),
+            Person.name.set_all(["Alice", "Bob", "Charles", "David", "Eve", "Fred"]),
+        ),
+    )
+    df2 = df.with_columns((df.s.age + 1).alias("next_year_age"))
+    assert df2[df2.s.next_year_age].max() == 37
+    if TYPE_CHECKING:
+        static_assert(
+            is_assignable_to(
+                TypeOf[df2],
+                tp.LazyFrame[
+                    Intersection[
+                        Person, tp.expr.AliasShape[Literal["next_year_age"], int]
+                    ]
+                ],
+            )
+        )
+    df3 = df.with_columns(
+        tp.when(df.s.age < 30)
+        .then(Suit.SPADES)
+        .otherwise(Suit.CLUBS)
+        .alias("assigned_suit")
+    )
+    assert df3[df3.s.assigned_suit].to_list() == [
+        "spades",
+        "spades",
+        "clubs",
+        "spades",
+        "clubs",
+        "clubs",
+    ]
+    if TYPE_CHECKING:
+        static_assert(
+            is_assignable_to(
+                TypeOf[df3],
+                tp.LazyFrame[
+                    Intersection[
+                        Person,
+                        tp.expr.AliasShape[Literal["assigned_suit"], Suit],
+                    ]
+                ],
+            )
+        )

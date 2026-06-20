@@ -158,7 +158,7 @@ customers.filter(customers.s.age >= 20, customers.s.state != "NY" | customers.s.
 
 #### Adding or removing columns
 
-You'll need to define a shape to have any extra columns, and if you want to properly remove a column (rather than `null`ing it with `.with_columns(col.null())`) you'll also need to define a shape. The easiest way is to extend a current shape:
+You'll often want to define a shape with extra columns to expand your dataframes, and if you want to properly remove a column (rather than `null`ing it with `.with_columns(col.null())`) you'll need to define a shape. The easiest way is to extend a existing shape via inheritance:
 
 ```py
 class PurchaseAtStore(Purchase):
@@ -172,6 +172,19 @@ purchases = purchases.transform(
     .to(PurchaseAtStore.location)
 )
 ```
+
+However, you can write this in a more Polars fashion if you're just adding a few columns:
+
+```py
+purchases = purchases.with_columns(
+    tp.when(purchases.s.product.str.contains("Ice Cream"))
+    .then("Beach")
+    .otherwise("Downtown")
+    .alias("location")
+)
+```
+
+Typol tracks these added columns and their types statically, so is still able to report any typing issues with them. However, they can get harder to write out the types for, so don't make great type annotations for function signatures and interfaces. Instead, consider using `.alias` locally for when you need to add a column or two for just a little bit.
 
 Most commonly, you'll need to add or remove columns when joining data. This will happen automatically for you, constructing `LeftShape & RightShape`:
 
@@ -303,6 +316,16 @@ Relabelling columns is quite important in Typol, since shapes are fixed and inte
 
 # Typol
 (person.s.age + 1).to(FuturePerson.age_next_year)
+```
+
+`.alias` instead can be used to alias an expression to a new column, that doesn't need to be part of an existing shape:
+
+```py
+person_with_email = person.with_columns(
+    (person.s.name.to_lowercase() + "@example.com").alias("email")
+)
+# Typol can track your added column names and still type them correctly
+reveal_type(person_with_email[person_with_email.s.email].to_list())  # Revealed type `list[str]`
 ```
 
 #### `*_out`
