@@ -75,7 +75,7 @@ which will have lowercased names, or you can add a column to a shape:
 accounts_with_emails = accounts.with_columns(
     (accounts.s.name.str.to_lowercase() + "@" + accounts.s.website).alias("email")
 )
-# It tracks your added column name and reveal the correct type:
+# It tracks your added column name and reveals the correct type:
 reveal_type(accounts_with_emails.s.email)  # Revealed type is `BoundDimension[..., str]`
 ```
 

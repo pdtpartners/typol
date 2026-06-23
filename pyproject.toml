@@ -1,6 +1,6 @@
 [project]
 name = "typol"
-version = "0.0.3"
+version = "0.0.4"
 requires-python = ">=3.12"
 description = "A typed layer on top of Polars, for statically enforcing schema types for dataframes"
 readme = "README.md"
