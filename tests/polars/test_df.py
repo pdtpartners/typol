@@ -17,12 +17,13 @@ from datetime import date, datetime, timedelta
 from io import BytesIO
 from typing import TYPE_CHECKING, Any
 
-import polars as pl
 import pytest
+import typol as tp
+from packaging.version import Version
 from polars.exceptions import ColumnNotFoundError
 from polars.testing import assert_frame_equal, assert_series_equal
 
-import typol as tp
+import polars as pl
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -492,7 +493,11 @@ def test_literal_series() -> None:
             orient="row",
         ),
         out.dataframe,
-        abs_tol=0.00001,
+        **(  # ty: ignore[invalid-argument-type]
+            dict(atol=0.00001)
+            if Version(pl.__version__) < Version("1.32.3")
+            else dict(abs_tol=0.00001)
+        ),
     )
 
 

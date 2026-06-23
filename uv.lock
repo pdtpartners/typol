@@ -656,7 +656,7 @@ wheels = [
 
 [[package]]
 name = "typol"
-version = "0.0.2"
+version = "0.0.3"
 source = { virtual = "." }
 dependencies = [
     { name = "more-itertools" },
@@ -692,7 +692,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "more-itertools", specifier = ">=8.0.0" },
-    { name = "polars", specifier = ">=1.40.0" },
+    { name = "polars", specifier = ">=1.12.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -701,21 +701,21 @@ check = [
     { name = "ty", specifier = ">=0.0.35" },
 ]
 dev = [
-    { name = "mkdocs" },
-    { name = "mkdocs-material" },
-    { name = "mkdocs-nav-weight" },
-    { name = "mkdocstrings", extras = ["python"] },
-    { name = "pymdown-extensions" },
+    { name = "mkdocs", specifier = ">=1.0" },
+    { name = "mkdocs-material", specifier = ">=1.0" },
+    { name = "mkdocs-nav-weight", specifier = ">=0.3.0" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=1.0" },
+    { name = "pymdown-extensions", specifier = ">=1.0" },
     { name = "pytest", specifier = ">=9.0.0" },
     { name = "ruff", specifier = ">=0.15.12" },
     { name = "ty", specifier = ">=0.0.35" },
 ]
 docs = [
-    { name = "mkdocs" },
-    { name = "mkdocs-material" },
-    { name = "mkdocs-nav-weight" },
-    { name = "mkdocstrings", extras = ["python"] },
-    { name = "pymdown-extensions" },
+    { name = "mkdocs", specifier = ">=1.0" },
+    { name = "mkdocs-material", specifier = ">=1.0" },
+    { name = "mkdocs-nav-weight", specifier = ">=0.3.0" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=1.0" },
+    { name = "pymdown-extensions", specifier = ">=1.0" },
 ]
 test = [{ name = "pytest", specifier = ">=9.0.0" }]
 

@@ -6,7 +6,7 @@ description = "A typed layer on top of Polars, for statically enforcing schema t
 readme = "README.md"
 dependencies = [
     "more-itertools>=8.0.0",
-    "polars>=1.40.0",
+    "polars>=1.12.0",
 ]
 license = "MIT"
 keywords = ["polars", "typing"]
@@ -33,11 +33,11 @@ check = [
     "ty>=0.0.35",
 ]
 docs = [
-    "mkdocs",
-    "mkdocstrings[python]",
-    "mkdocs-material",
-    "mkdocs-nav-weight",
-    "pymdown-extensions",
+    "mkdocs>=1.0",
+    "mkdocstrings[python]>=1.0",
+    "mkdocs-material>=1.0",
+    "mkdocs-nav-weight>=0.3.0",
+    "pymdown-extensions>=1.0",
 ]
 dev = [
     {include-group = "test"},

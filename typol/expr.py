@@ -29,6 +29,7 @@ import polars as pl
 import polars.datatypes
 import polars.expr.whenthen
 from more_itertools import first
+from packaging.version import Version
 
 from typol.series import Series
 from typol.types import STRING, EnumOf, StructMapping, Type, Typeable, from_typeable, normalize_enum
@@ -194,7 +195,12 @@ class Alias(Generic[_S_contra, _A, _T]):
     def construct_shape(
         self, context: pl.Schema | pl.DataFrame | pl.LazyFrame
     ) -> type[AliasShape[_A, _T]]:
-        pl_ty = pl.dtype_of(self.expr).collect_dtype(context)
+        if Version(pl.__version__) >= Version("1.40"):
+            pl_ty = pl.dtype_of(self.expr).collect_dtype(context)
+        else:
+            # Legacy compatible way of retrieving the alias's dtype
+            assert isinstance(context, (pl.DataFrame, pl.LazyFrame))
+            pl_ty = context.select(self.expr).collect_schema().dtypes()[0]
         ty = Type(pl_ty.to_python(), pl_ty)
 
         class _AliasShape(AliasShape): ...

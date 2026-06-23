@@ -23,6 +23,7 @@ import more_itertools
 import polars as pl
 import polars.lazyframe.group_by
 from more_itertools import first, prepend
+from packaging.version import Version
 
 from typol.expr import (
     AggExpr,
@@ -199,6 +200,10 @@ class LazyFrame(Generic[_S_co]):
     def collect(
         self, engine: Literal["auto", "in-memory", "streaming", "gpu"] = "auto"
     ) -> DataFrame[_S_co]:
+        pre_auto = Version(pl.__version__) < Version("1.40.0")
+        if pre_auto and engine == "auto":
+            # Older versions don't support auto
+            engine = cast(Literal["auto"], "cpu")
         df = self.dataframe.collect(engine=engine, background=False)
         return DataFrame(self.shape, df)
 
