@@ -248,7 +248,7 @@ type ExoAggExpr[S: Shape, T] = AggExpr[S, Never, T]
 type MesoAggExpr[S: Shape, T] = AggExpr[S, Never, T]
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, eq=False)
 class AggExpr[S: Shape, R: Shape, T]:
     """
     An expression created by an aggregation function (e.g. `.sum()`). This can't be used as a normal
@@ -1605,7 +1605,7 @@ ExoExpr: TypeAlias = Expr[_S_contra, Never, _T]
 MesoExpr: TypeAlias = Expr[_S_contra, Never, _T]
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, eq=False)
 class IntermediateExpr[S: Shape, R: Shape, T](Expr[S, R, T]):
     """
     An expression created from another expression, this just stores the polars expression generated
@@ -1615,7 +1615,7 @@ class IntermediateExpr[S: Shape, R: Shape, T](Expr[S, R, T]):
     expr: pl.Expr = dataclasses.field()
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, eq=False, unsafe_hash=True)
 class BoundDimension(Expr[_S_contra, _S_contra, _T]):
     """
     This binds the shape to the dimension at the type level, which means this shape can then
@@ -1657,7 +1657,7 @@ class BoundDimension(Expr[_S_contra, _S_contra, _T]):
         return null.to(self)
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, eq=False)
 class Initializer(Expr[Any, _S_contra, _T]):
     """
     Used in `Entry.of` to allow constructing rows where the dimension matches the assigned column
@@ -1722,7 +1722,7 @@ class When(Generic[_S_contra]):
         )
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True, eq=False)
 class PartialConditional(Expr[_S_contra, _R_contra, _T]):
     """
     The intermediate state where one outcome value has been provided but not the other, which

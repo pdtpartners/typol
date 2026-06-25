@@ -72,6 +72,47 @@ def test_comparsions() -> None:
     )
 
 
+def test_comparsions_as_operators() -> None:
+    assert _INTS.filter(Int.value > 3).equals(_single_col_df(Int.value, 5, 4))
+    assert _INTS.filter(Int.value < 3).equals(_single_col_df(Int.value, 1, 2))
+    assert _INTS.filter(Int.value >= 3).equals(_single_col_df(Int.value, 5, 4, 3))
+    assert _INTS.filter(Int.value <= 3).equals(_single_col_df(Int.value, 1, 2, 3))
+    assert _INTS.filter(Int.value == 3).equals(_single_col_df(Int.value, 3))
+    assert _INTS.filter(Int.value != 3).equals(_single_col_df(Int.value, 1, 5, 2, 4))
+
+    assert _FLOATS.filter(Float.value > math.pi).equals(
+        _single_col_df(Float.value, 4.8, 4.0)
+    )
+    assert _FLOATS.filter(Float.value < math.pi).equals(
+        _single_col_df(Float.value, 1.2, 2.5)
+    )
+    assert _FLOATS.filter(Float.value >= math.pi).equals(
+        _single_col_df(Float.value, 4.8, 4.0, math.pi)
+    )
+    assert _FLOATS.filter(Float.value <= math.pi).equals(
+        _single_col_df(Float.value, 1.2, 2.5, math.pi)
+    )
+    assert _FLOATS.filter(Float.value == math.pi).equals(
+        _single_col_df(Float.value, math.pi)
+    )
+
+    assert _STRS.filter(String.value > "foo").equals(
+        _single_col_df(String.value, "spam")
+    )
+    assert _STRS.filter(String.value < "foo").equals(
+        _single_col_df(String.value, "eggs", "bar")
+    )
+    assert _STRS.filter(String.value >= "foo").equals(
+        _single_col_df(String.value, "spam", "foo")
+    )
+    assert _STRS.filter(String.value <= "foo").equals(
+        _single_col_df(String.value, "eggs", "foo", "bar")
+    )
+    assert _STRS.filter(String.value == "foo").equals(
+        _single_col_df(String.value, "foo")
+    )
+
+
 def test_arithmetic() -> None:
     assert _INTS.with_columns(Int.value * 2 + 5).equals(
         _single_col_df(Int.value, 7, 15, 9, 13, 11)
