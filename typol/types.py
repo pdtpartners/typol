@@ -63,29 +63,28 @@ def from_typeable[T](t: Typeable[T]) -> Type[T]:
     return Type(t, pl.DataType.from_python(t))
 
 
-BOOLEAN: Final = Type(bool, pl.Boolean)
+BOOLEAN: Final = Type[bool](bool, pl.Boolean)
 
-INT_8: Final = Type(int, pl.Int8)
-INT_16: Final = Type(int, pl.Int16)
-INT_32: Final = Type(int, pl.Int32)
-INT_64: Final = Type(int, pl.Int64)
+INT_8: Final = Type[int](int, pl.Int8)
+INT_16: Final = Type[int](int, pl.Int16)
+INT_32: Final = Type[int](int, pl.Int32)
+INT_64: Final = Type[int](int, pl.Int64)
 
-UINT_8: Final = Type(int, pl.UInt8)
-UINT_16: Final = Type(int, pl.UInt16)
-UINT_32: Final = Type(int, pl.UInt32)
-UINT_64: Final = Type(int, pl.UInt64)
+UINT_8: Final = Type[int](int, pl.UInt8)
+UINT_16: Final = Type[int](int, pl.UInt16)
+UINT_32: Final = Type[int](int, pl.UInt32)
+UINT_64: Final = Type[int](int, pl.UInt64)
 
-FLOAT_32: Final = Type(float, pl.Float32)
-FLOAT_64: Final = Type(float, pl.Float64)
+FLOAT_32: Final = Type[float](float, pl.Float32)
+FLOAT_64: Final = Type[float](float, pl.Float64)
 
-STRING: Final = Type(str, pl.String)
-CATEGORICAL: Final = Type(str, pl.String)
+STRING: Final = Type[str](str, pl.String)
+CATEGORICAL: Final = Type[str](str, pl.String)
 
-DATE: Final = Type(_datetime.date, pl.Date)
-DATETIME: Final = Type(_datetime.datetime, pl.Datetime())
-TIME: Final = Type(_datetime.time, pl.Time)
-DURATION: Final = Type(_datetime.timedelta, pl.Duration)
-
+DATE: Final = Type[_datetime.date](_datetime.date, pl.Date)
+DATETIME: Final = Type[_datetime.datetime](_datetime.datetime, pl.Datetime())
+TIME: Final = Type[_datetime.time](_datetime.time, pl.Time)
+DURATION: Final = Type[_datetime.timedelta](_datetime.timedelta, pl.Duration)
 
 TimeUnit: TypeAlias = Literal["ns", "us", "ms"]
 

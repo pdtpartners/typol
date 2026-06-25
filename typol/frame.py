@@ -440,18 +440,17 @@ class DataFrame(Generic[_S_co]):
     ) -> T:
         return function(self, *args, **kwargs)
 
-    @classmethod
-    def read_csv(
-        cls,
-        shape: type[_S_co],
+    @staticmethod
+    def read_csv[S: Shape](
+        shape: type[S],
         source: IO[str] | str | bytes | Path | IO[bytes],
-        mappings: Mapping[BoundDimension[_S_co, Any], str] | None = None,
+        mappings: Mapping[BoundDimension[S, Any], str] | None = None,
         *,
         has_header: bool = True,
         skip_rows: int = 0,
-    ) -> Self:
+    ) -> DataFrame[S]:
         if not has_header:
-            return cls(
+            return DataFrame(
                 shape,
                 pl.read_csv(
                     source,
@@ -474,7 +473,7 @@ class DataFrame(Generic[_S_co]):
                 for d in shape.shape_meta().dimensions
             }
 
-        return cls(
+        return DataFrame(
             shape,
             pl.read_csv(
                 source,

@@ -444,19 +444,18 @@ class LazyFrame(Generic[_S_co]):
     ) -> T:
         return function(self, *args, **kwargs)
 
-    @classmethod
-    def scan_csv(
-        cls,
-        shape: type[_S_co],
+    @staticmethod
+    def scan_csv[S: Shape](
+        shape: type[S],
         source: IO[str] | str | bytes | Path | IO[bytes],
-        mappings: Mapping[BoundDimension[_S_co, Any], str] | None = None,
+        mappings: Mapping[BoundDimension[S, Any], str] | None = None,
         *,
         has_header: bool = True,
         skip_rows: int = 0,
         low_memory: bool = False,
-    ) -> Self:
+    ) -> LazyFrame[S]:
         if not has_header:
-            return cls(
+            return LazyFrame(
                 shape,
                 pl.scan_csv(
                     source,
@@ -480,7 +479,7 @@ class LazyFrame(Generic[_S_co]):
                 for d in shape.shape_meta().dimensions
             }
 
-        return cls(
+        return LazyFrame(
             shape,
             pl.scan_csv(
                 source,
