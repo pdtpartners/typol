@@ -450,3 +450,30 @@ def test_join_df_nulls_equal() -> None:
             "email": "douglas@adams.net",
         },
     ]
+
+
+def test_concat_df() -> None:
+    assert tp.DataFrame.concat(
+        Person,
+        (
+            tp.DataFrame(Person, _PEOPLE),
+            tp.DataFrame(Person, _PEOPLE).with_columns(Person.name + "2"),
+        ),
+    ).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+        },
+        {
+            "name": "William",
+            "age": 80,
+        },
+        {
+            "name": "Douglas2",
+            "age": 42,
+        },
+        {
+            "name": "William2",
+            "age": 80,
+        },
+    ]

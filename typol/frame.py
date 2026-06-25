@@ -333,8 +333,11 @@ class DataFrame(Generic[_S_co]):
             self.shape, self.dataframe.vstack(other.dataframe.select(self.dataframe.columns))
         )
 
-    @classmethod
-    def concat(cls, shape: type[_S_co], frames: Iterable[Self]) -> DataFrame[_S_co]:
+    @staticmethod
+    def concat[S: Shape](shape: type[S], frames: Iterable[DataFrame[S]]) -> DataFrame[S]:
+        # Lazy import to avoid circular dependencies
+        from typol.lazy import LazyFrame  # noqa: PLC0415,RUF100
+
         return LazyFrame.concat(shape, map(DataFrame.lazy, frames)).collect()
 
     def rechunk(self) -> DataFrame[_S_co]:

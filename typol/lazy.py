@@ -364,12 +364,12 @@ class LazyFrame(Generic[_S_co]):
         """
         return LazyGroupBy(shape, self.dataframe.group_by(*(k.expr for k in keys)))
 
-    @classmethod
-    def concat(cls, shape: type[_S_co], frames: Iterable[Self]) -> LazyFrame[_S_co]:
+    @staticmethod
+    def concat[S: Shape](shape: type[S], frames: Iterable[LazyFrame[S]]) -> LazyFrame[S]:
         frames = iter(frames)
         if head := first(frames, None):
             return head.vstack(*frames)
-        return cls(shape)
+        return LazyFrame(shape)
 
     def vstack(self, *frames: Self) -> LazyFrame[_S_co]:
         # We know these share the same shape, but we don't know the order of the columns matches.
