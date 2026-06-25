@@ -224,11 +224,11 @@ class DataFrame(Generic[_S_co]):
     def with_columns(self, *columns: EndoExpr[_S_co, Any]) -> DataFrame[_S_co]: ...
     @overload
     def with_columns[A: LiteralString, AT](
-        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+        self, alias: Alias[_S_co, A, AT], /, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
     ) -> DataFrame[Intersection[_S_co, AliasShape[A, AT]]]: ...
 
     def with_columns[A: LiteralString, AT](
-        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+        self, *columns: Any
     ) -> DataFrame[Intersection[_S_co, AliasShape[A, AT]]]:
         """
         Use the provided expressions to update existing columns in the shape:

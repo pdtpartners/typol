@@ -223,7 +223,7 @@ class LazyFrame(Generic[_S_co]):
     def with_columns(self, *columns: EndoExpr[_S_co, Any]) -> LazyFrame[_S_co]: ...
     @overload
     def with_columns[A: LiteralString, AT](
-        self, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
+        self, alias: Alias[_S_co, A, AT], /, *columns: EndoExpr[_S_co, Any] | Alias[_S_co, A, AT]
     ) -> LazyFrame[Intersection[_S_co, AliasShape[A, AT]]]: ...
 
     def with_columns[A: LiteralString, AT](

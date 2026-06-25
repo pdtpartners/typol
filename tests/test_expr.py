@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Final
 import typol as tp
 
 if TYPE_CHECKING:
-    pass
+    from ty_extensions import TypeOf, is_equivalent_to, static_assert
 
 
 class Int(tp.Shape):
@@ -136,9 +136,18 @@ def test_lit() -> None:
 
 
 def test_when() -> None:
-    assert _INTS.with_columns(
-        tp.when(Int.value.gt(3)).then(Int.value / 2).otherwise(Int.value + 1)
-    ).equals(_single_col_df(Int.value, 2, 2, 3, 2, 4))
+    over_three_divide_by_two_otherwise_add_one = _INTS.with_columns(
+        tp.when(Int.value > 3).then(Int.value / 2).otherwise(Int.value + 1)
+    )
+    assert over_three_divide_by_two_otherwise_add_one.equals(
+        _single_col_df(Int.value, 2, 2, 3, 2, 4)
+    )
+    if TYPE_CHECKING:
+        static_assert(
+            is_equivalent_to(
+                TypeOf[over_three_divide_by_two_otherwise_add_one], tp.DataFrame[Int]
+            )
+        )
     # Use a column name to make sure it doesn't pick that up
     assert _STRS.with_columns(
         tp.when(String.value.str.len_chars().gt(3)).then(String.value)
