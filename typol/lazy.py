@@ -14,6 +14,7 @@ from typing import (
     LiteralString,
     Self,
     TypeVar,
+    Unpack,
     assert_never,
     cast,
     overload,
@@ -41,7 +42,14 @@ from typol.expr import (
     Suffixed,
     suffix,
 )
-from typol.frame import DataFrame, enforce_shape
+from typol.frame import (
+    DataFrame,
+    JoinAgainstType,
+    JoinOptions,
+    JoinTogetherType,
+    JoinType,
+    enforce_shape,
+)
 from typol.series import BoundSeries, LazySeries
 from typol.types import list_of
 
@@ -520,16 +528,42 @@ class LazyFrame(Generic[_S_co]):
         )
         return LazyFrame["Intersection[_S_co, Q]"](self.shape & right.shape, joined)
 
+    @overload
     def join[Q: Shape](
         self,
         right: LazyFrame[Q],
-        *on: JoinOn[_S_co, Q, Any] | ExoExpr[_S_co | Q, Any],
-        how: Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"] = "inner",
-    ) -> LazyFrame[Intersection[_S_co, Q]]:
+        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        how: JoinTogetherType = "inner",
+        **options: Unpack[JoinOptions],
+    ) -> LazyFrame[Intersection[_S_co, Q]]: ...
+    @overload
+    def join[Q: Shape](
+        self,
+        right: LazyFrame[Q],
+        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        how: JoinAgainstType,
+        **options: Unpack[JoinOptions],
+    ) -> LazyFrame[_S_co]: ...
+    @overload
+    def join[Q: Shape](
+        self,
+        right: LazyFrame[Q],
+        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        how: JoinType = "inner",
+        **options: Unpack[JoinOptions],
+    ) -> LazyFrame[Intersection[_S_co, Q]] | LazyFrame[_S_co]: ...
+
+    def join[Q: Shape](
+        self,
+        right: LazyFrame[Q],
+        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        how: JoinType = "inner",
+        **options: Unpack[JoinOptions],
+    ) -> LazyFrame[Intersection[_S_co, Q]] | LazyFrame[_S_co]:
         """
         Join two tables into a common shape, the intersection of the two provided shapes:
 
-        ```
+        ```py
         customers.join(
             purchases,
             customers.s.name.on(purchases.s.customer),
@@ -540,7 +574,7 @@ class LazyFrame(Generic[_S_co]):
         If there are conflicting columns, Polars will not be able to distinguish the results.
         Explicitly distinguish two shapes with `df.suffix()`, particularly important for self-joins:
 
-        ```
+        ```py
         # Add a suffix to all the columns so they can be referred to independently
         other_customers = customers.suffix()
         # Join customers against itself to find ones where the names conflict
@@ -560,14 +594,21 @@ class LazyFrame(Generic[_S_co]):
             Join on the same columns for the left and the right shapes based on the joint shape.
             The column must be available in both original shapes
         how : Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"]
-            Type of join to apply
+            Type of join to apply. "anti" and "semi" joins are different in that they return the
+            left shape only
+        **options : JoinOptions
+            Other Polars-support join options, may vary by Polars version
         """
+        if Version(pl.__version__) < Version("1.24") and (jn := options.pop("nulls_equal", None)):
+            # Pre-1.24, Polars calls this column "join_nulls"
+            options["join_nulls"] = jn  # ty: ignore[invalid-key]
         if on:
             joined = self.dataframe.join(
                 right.dataframe,
                 left_on=[(e.left if isinstance(e, JoinOn) else e).expr for e in on],
                 right_on=[(e.right if isinstance(e, JoinOn) else e).expr for e in on],
                 how=how,
+                **options,
             )
             already_populated = frozenset(joined.collect_schema().keys())
             joined = joined.with_columns(
@@ -581,7 +622,7 @@ class LazyFrame(Generic[_S_co]):
                 and e.right.name not in already_populated
             )
         else:
-            joined = self.dataframe.join(right.dataframe, how=how)
+            joined = self.dataframe.join(right.dataframe, how=how, **options)
         return LazyFrame["Intersection[_S_co, Q]"](self.shape & right.shape, joined)
 
     def sum(self) -> LazyFrame[_S_co]:

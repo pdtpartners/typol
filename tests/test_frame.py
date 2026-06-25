@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Final, Literal
 
 import pytest
 import typol as tp
+from typol.expr import Expr
 from typol.types import EnumOf
 
 if TYPE_CHECKING:
@@ -398,3 +399,54 @@ def test_alias() -> None:
                 ],
             )
         )
+
+
+def test_join_df_nulls_equal() -> None:
+    people = tp.DataFrame(
+        Person,
+        (
+            tp.Entry.of(Person.name.set("Douglas"), Person.age.set(42)),
+            tp.Entry.of(Person.name.set_or_null(None), Person.age.set(80)),
+        ),
+    )
+    accounts = tp.DataFrame(
+        Account,
+        (
+            tp.Entry.of(
+                Account.username.set("douglas"), Account.email.set("douglas@adams.net")
+            ),
+            tp.Entry.of(
+                Account.username.set_or_null(None),
+                Account.email.set("will@wilberforce.net"),
+            ),
+        ),
+    )
+    lowered_name: Expr[Person, Person, str] = Person.name.str.to_lowercase()
+    nulls_equal = people.join(
+        accounts, lowered_name.on(Account.username), nulls_equal=True
+    )
+    assert nulls_equal.sort(Person.name).to_dicts() == [
+        {
+            "name": None,
+            "age": 80,
+            "username": None,
+            "email": "will@wilberforce.net",
+        },
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+    ]
+    nulls_unequal = people.join(
+        accounts, lowered_name.on(Account.username), nulls_equal=False
+    )
+    assert nulls_unequal.sort(Person.name).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+    ]

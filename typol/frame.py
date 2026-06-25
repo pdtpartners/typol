@@ -14,7 +14,9 @@ from typing import (
     LiteralString,
     Self,
     TypeAlias,
+    TypedDict,
     TypeVar,
+    Unpack,
     assert_never,
     cast,
     overload,
@@ -49,7 +51,16 @@ if TYPE_CHECKING:
     from typol.lazy import LazyFrame
 
 CsvQuoteStyle: TypeAlias = Literal["necessary", "always", "non_numeric", "never"]
-JoinType: TypeAlias = Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"]
+JoinTogetherType: TypeAlias = Literal["inner", "left", "right", "full", "cross", "outer"]
+JoinAgainstType: TypeAlias = Literal["semi", "anti"]
+JoinType: TypeAlias = JoinTogetherType | JoinAgainstType
+
+
+class JoinOptions(TypedDict, total=False):
+    nulls_equal: bool
+    maintain_order: Literal["none", "left", "right", "left_right", "right_left"] | None
+    validate: Literal["m:m", "m:1", "1:m", "1:1"]
+
 
 _S_co = TypeVar("_S_co", bound=Shape, covariant=True)
 
@@ -632,12 +643,30 @@ class DataFrame(Generic[_S_co]):
         )
         return DataFrame["Intersection[_S_co, Q]"](self.shape & right.shape, joined)
 
+    @overload
     def join[Q: Shape](
         self,
         right: DataFrame[Q],
         *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
-        how: Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"] = "inner",
-    ) -> DataFrame[Intersection[_S_co, Q]]:
+        how: JoinTogetherType = "inner",
+        **options: Unpack[JoinOptions],
+    ) -> DataFrame[Intersection[_S_co, Q]]: ...
+    @overload
+    def join[Q: Shape](
+        self,
+        right: DataFrame[Q],
+        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        how: JoinAgainstType,
+        **options: Unpack[JoinOptions],
+    ) -> DataFrame[_S_co]: ...
+
+    def join[Q: Shape](
+        self,
+        right: DataFrame[Q],
+        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        how: JoinType | Literal["anti"] = "inner",
+        **options: Unpack[JoinOptions],
+    ) -> DataFrame[Intersection[_S_co, Q]] | DataFrame[_S_co]:
         """
         Join two tables into a common shape, the intersection of the two provided shapes:
 
@@ -672,9 +701,12 @@ class DataFrame(Generic[_S_co]):
             Join on the same columns for the left and the right shapes based on the joint shape.
             The column must be available in both original shapes
         how : Literal["inner", "left", "right", "full", "semi", "anti", "cross", "outer"]
-            Type of join to apply
+            Type of join to apply. "anti" and "semi" joins are different in that they return the
+            left shape only
+        **options : JoinOptions
+            Other Polars-support join options, may vary by Polars version
         """
-        return self.lazy().join(right.lazy(), *on, how=how).collect()
+        return self.lazy().join(right.lazy(), *on, how=how, **options).collect()
 
     def sum(self) -> DataFrame[_S_co]:
         """Sum all numeric columns in the frame, leaving other columns as null"""
