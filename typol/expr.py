@@ -21,6 +21,7 @@ from typing import (
     TypeAlias,
     TypedDict,
     TypeVar,
+    Unpack,
     cast,
     overload,
 )
@@ -296,6 +297,12 @@ class AggExpr[S: Shape, R: Shape, T]:
         )
 
 
+class _StrSplitOptions(TypedDict, total=False):
+    inclusive: bool
+    literal: bool
+    strict: bool
+
+
 @dataclasses.dataclass(frozen=True)
 class StrExprNamespace[S: Shape, R: Shape, T]:
     """Namespace for string functions, similar to `pl.Expr.str`"""
@@ -310,15 +317,16 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
         return IntermediateExpr(self.expr.expr.str.contains(substr, literal=literal))
 
     def contains_any[Q: Shape](
-        self, substrings: Collection[ExoExpr[Q, str] | str], *, ascii_case_insensitive: bool = False
+        self, substrings: Collection[str], *, ascii_case_insensitive: bool = False
     ) -> MesoExpr[Intersection[S, Q], bool]:
         """
-        Whether each column value contains the regex (or if `ascii_case_insensitive` is set, then
+        Whether each column value contains the substring (or if `ascii_case_insensitive` is set, then
         the match can be either upper or lower case)
         """
-        substrs = [_pl_expr(s) for s in substrings]
         return IntermediateExpr(
-            self.expr.expr.str.contains_any(substrs, ascii_case_insensitive=ascii_case_insensitive)
+            self.expr.expr.str.contains_any(
+                substrings, ascii_case_insensitive=ascii_case_insensitive
+            )
         )
 
     def count_matches[Q: Shape](
@@ -596,19 +604,10 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
         return IntermediateExpr(self.expr.expr.is_not_null() & self.expr.expr.ne(""))
 
     def split[SA: Shape](
-        self,
-        sep: ExoExpr[SA, str] | str,
-        *,
-        inclusive: bool = False,
-        literal: bool = False,
-        strict: bool = True,
+        self, sep: ExoExpr[SA, str] | str, **options: Unpack[_StrSplitOptions]
     ) -> MesoExpr[Intersection[S, SA], list[str]]:
         """Break a string into a list of strings, using `sep` as the separator"""
-        return IntermediateExpr(
-            self.expr.expr.str.split(
-                _pl_expr(sep), inclusive=inclusive, literal=literal, strict=strict
-            )
-        )
+        return IntermediateExpr(self.expr.expr.str.split(_pl_expr(sep), **options))
 
     def splitn[SA: Shape](
         self, sep: ExoExpr[SA, str] | str, n: int

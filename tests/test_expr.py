@@ -2,6 +2,7 @@ import math
 from typing import TYPE_CHECKING, Final
 
 import typol as tp
+from packaging.version import Version
 
 if TYPE_CHECKING:
     from ty_extensions import TypeOf, is_equivalent_to, static_assert
@@ -152,3 +153,32 @@ def test_when() -> None:
     assert _STRS.with_columns(
         tp.when(String.value.str.len_chars().gt(3)).then(String.value)
     ).equals(_single_col_df(String.value, "spam", "eggs", None, None))
+
+
+def test_str_functions() -> None:
+    assert _STRS.filter(_STRS.s.value.str.contains(r"a[rm]"))[
+        _STRS.s.value
+    ].to_list() == ["spam", "bar"]
+    assert _STRS.filter(_STRS.s.value.str.contains_any([r"am", r"oo"]))[
+        _STRS.s.value
+    ].to_list() == ["spam", "foo"]
+    assert _STRS.filter(_STRS.s.value.str.count_matches(r"[og]") > 1)[
+        _STRS.s.value
+    ].to_list() == ["eggs", "foo"]
+    assert _STRS.filter(_STRS.s.value.str.ends_with("oo"))[_STRS.s.value].to_list() == [
+        "foo"
+    ]
+    assert _STRS[_STRS.s.value.str.split("a")].to_list() == [
+        ["sp", "m"],
+        ["eggs"],
+        ["foo"],
+        ["b", "r"],
+    ]
+    # Older Polars versions don't support splitting by regex
+    if Version(tp.expr.pl.__version__) >= Version("1.40"):
+        assert _STRS[_STRS.s.value.str.split("[oa]", literal=False)].to_list() == [
+            ["sp", "m"],
+            ["eggs"],
+            ["f", "", ""],
+            ["b", "r"],
+        ]
