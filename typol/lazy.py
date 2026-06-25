@@ -50,7 +50,7 @@ from typol.frame import (
     JoinType,
     enforce_shape,
 )
-from typol.series import BoundSeries, LazySeries
+from typol.series import LazySeries
 from typol.types import list_of
 
 if TYPE_CHECKING:
@@ -249,7 +249,7 @@ class LazyFrame(Generic[_S_co]):
         return LazyFrame(shape, df)
 
     def transform[SNew: Shape](
-        self, shape: type[SNew], *transforms: Expr[_S_co, SNew, Any] | BoundSeries[SNew, Any]
+        self, shape: type[SNew], *transforms: Expr[_S_co, SNew, Any]
     ) -> LazyFrame[SNew]:
         """
         Convert from one shape to another shape, using the provided expressions to map columns in

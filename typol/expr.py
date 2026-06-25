@@ -1657,6 +1657,13 @@ class BoundDimension(Expr[_S_contra, _S_contra, _T]):
 
 
 @dataclasses.dataclass(frozen=True, eq=False)
+class BoundSeries[S: Shape, T](Expr[Any, S, T]):
+    """A series bound to a name that can be inserted into shape `S`"""
+
+    expr: pl.Series
+
+
+@dataclasses.dataclass(frozen=True, eq=False)
 class Initializer(Expr[Any, _S_contra, _T]):
     """
     Used in `Entry.of` to allow constructing rows where the dimension matches the assigned column

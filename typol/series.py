@@ -9,7 +9,7 @@ import polars as pl
 from typol.types import EnumOf, Typeable, from_typeable
 
 if TYPE_CHECKING:
-    from typol.expr import BoundDimension, Shape
+    from typol.expr import BoundDimension, BoundSeries, Shape
 
 
 @dataclasses.dataclass(frozen=True)
@@ -19,6 +19,9 @@ class Series[T]:
     data: pl.Series
 
     def to[S: Shape](self, dimension: BoundDimension[S, T]) -> BoundSeries[S, T]:
+        # Lazy import to avoid circular dependencies
+        from typol.expr import BoundSeries  # noqa: PLC0415,RUF100
+
         return BoundSeries(self.data.alias(dimension.name).cast(dimension.ty.pl_ty))
 
     @overload
@@ -226,13 +229,6 @@ class LazySeries[T]:
 
     def collect(self) -> Series[T]:
         return Series(_collect(self.data))
-
-
-@dataclasses.dataclass(frozen=True)
-class BoundSeries[S: Shape, T]:
-    """A series bound to a name that can be inserted into shape `S`"""
-
-    expr: pl.Series
 
 
 def _collect(lf: pl.LazyFrame) -> pl.Series:
