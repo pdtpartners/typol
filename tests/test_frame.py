@@ -498,3 +498,69 @@ def test_antijoin_df() -> None:
             "email": "will@wilberforce.net",
         },
     ]
+
+
+def test_default_sort() -> None:
+    """
+    By default, sorting should be in order of definition, since this is well defined and controlled
+    by the user in Typol
+    """
+    people = tp.DataFrame(Person, _PEOPLE)
+    accounts = tp.DataFrame(Account, _ACCOUNTS)
+    people = people.vstack(people.with_columns(people.s.age + 1))
+    assert people.sort().to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+        },
+        {
+            "name": "Douglas",
+            "age": 43,
+        },
+        {
+            "name": "William",
+            "age": 80,
+        },
+        {
+            "name": "William",
+            "age": 81,
+        },
+    ]
+    assert accounts.sort().to_dicts() == [
+        {
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+    assert people.sort(descending=True).to_dicts() == [
+        {
+            "name": "William",
+            "age": 81,
+        },
+        {
+            "name": "William",
+            "age": 80,
+        },
+        {
+            "name": "Douglas",
+            "age": 43,
+        },
+        {
+            "name": "Douglas",
+            "age": 42,
+        },
+    ]
+    assert accounts.sort(descending=True).to_dicts() == [
+        {
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+        {
+            "username": "douglas",
+            "email": "douglas@adams.net",
+        },
+    ]

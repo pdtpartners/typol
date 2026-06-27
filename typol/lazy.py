@@ -405,7 +405,7 @@ class LazyFrame(Generic[_S_co]):
         return LazyFrame(
             self.shape,
             self.dataframe.sort(
-                (e.expr for e in exprs),
+                (e.expr for e in (exprs or self.shape.shape_meta().dimensions)),
                 descending=descending,
                 nulls_last=nulls_last,
                 maintain_order=maintain_order,
