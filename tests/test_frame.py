@@ -564,3 +564,77 @@ def test_default_sort() -> None:
             "email": "douglas@adams.net",
         },
     ]
+
+
+def test_join_df_with_aliases() -> None:
+    people = tp.DataFrame(Person, _PEOPLE)
+    accounts = tp.DataFrame(Account, _ACCOUNTS)
+    people = people.with_columns(people.s.name.str.to_lowercase().alias("lowered"))
+    left = people.join(accounts, people.s.lowered.on(Account.username), how="left")
+    right = people.join(accounts, people.s.lowered.on(Account.username), how="right")
+    inner = people.join(accounts, people.s.lowered.on(Account.username), how="inner")
+    outer = people.join(accounts, people.s.lowered.on(Account.username), how="outer")
+    assert left.sort(Person.name).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "lowered": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": "William",
+            "age": 80,
+            "lowered": "william",
+            "username": "william",
+            "email": None,
+        },
+    ]
+    assert right.sort(right.s.username).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "lowered": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "lowered": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+    assert inner.to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "lowered": "douglas",
+            "email": "douglas@adams.net",
+        }
+    ]
+    assert outer.sort(Person.name, Account.username, nulls_last=True).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "lowered": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": "William",
+            "age": 80,
+            "username": None,
+            "lowered": "william",
+            "email": None,
+        },
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "lowered": None,
+            "email": "will@wilberforce.net",
+        },
+    ]

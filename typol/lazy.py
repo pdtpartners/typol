@@ -617,18 +617,27 @@ class LazyFrame(Generic[_S_co]):
                 return LazyFrame[_S_co](self.shape, joined)
 
             already_populated = frozenset(joined.collect_schema().keys())
+            fill_in, fill_from = ("left", "right") if how == "right" else ("right", "left")
             joined = joined.with_columns(
                 # Polars will drop right columns with different names if they're simple matchups
                 # Restore the right column names so the full self.shape & right.shape shape is
                 # generated
-                e.left.expr.alias(e.right.name)
+                getattr(e, fill_from).expr.alias(r.name)
                 for e in on
                 if isinstance(e, JoinOn)
-                and isinstance(e.right, BoundDimension)
-                and e.right.name not in already_populated
+                and isinstance(r := getattr(e, fill_in), BoundDimension)
+                and r.name not in already_populated
             )
         else:
             joined = self.dataframe.join(right.dataframe, how=how, **options)
+        if (
+            Version(pl.__version__) < Version("1.31")
+            and issubclass(self.shape, AliasShape)
+            or issubclass(right.shape, AliasShape)
+        ):
+            # Older versions of Polars struggle with some of the changes in schema without resolving
+            # the lazy frame when adding columns ad-hoc with `with_columns`
+            joined = joined.collect().lazy()
         return LazyFrame["Intersection[_S_co, Q]"](self.shape & right.shape, joined)
 
     def sum(self) -> LazyFrame[_S_co]:
