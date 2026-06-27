@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING, Final
 import typol as tp
 from packaging.version import Version
 
+import polars as pl
+
 if TYPE_CHECKING:
     from ty_extensions import TypeOf, is_equivalent_to, static_assert
 
@@ -18,6 +20,11 @@ class Float(tp.Shape):
 
 class String(tp.Shape):
     value = tp.dimension(str)
+
+
+class Person(tp.Shape):
+    name = tp.dimension(str)
+    age = tp.dimension(int)
 
 
 def _single_col_df[S: tp.Shape, T](
@@ -182,3 +189,48 @@ def test_str_functions() -> None:
             ["f", "", ""],
             ["b", "r"],
         ]
+
+
+def test_intersections() -> None:
+    assert (Person & String).shape_meta().schema == pl.Schema(
+        {
+            "name": pl.String,
+            "age": pl.Int64,
+            "value": pl.String,
+        }
+    )
+    assert (String & Person).shape_meta().schema == pl.Schema(
+        {
+            "value": pl.String,
+            "name": pl.String,
+            "age": pl.Int64,
+        }
+    )
+    # Conflicting columns
+    assert (String & Int).shape_meta().schema == pl.Schema(
+        {
+            "value": pl.String,
+        }
+    )
+    assert (Int & String).shape_meta().schema == pl.Schema(
+        {
+            "value": pl.Int64,
+        }
+    )
+
+    class TwoStrings(String):
+        value2 = tp.dimension(str)
+
+    # Intersecting with some subshape
+    assert (TwoStrings & String).shape_meta().schema == pl.Schema(
+        {
+            "value": pl.String,
+            "value2": pl.String,
+        }
+    )
+    assert (String & TwoStrings).shape_meta().schema == pl.Schema(
+        {
+            "value": pl.String,
+            "value2": pl.String,
+        }
+    )

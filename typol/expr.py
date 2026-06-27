@@ -113,8 +113,10 @@ class ShapeType(type):
     def __and__[S: Shape, Q: Shape](cls: type[S], other: type[Q]) -> Intersection[type[S], type[Q]]:
         if cls is other:
             return cls
+        # Switch the order if other <: cls, to avoid inconsistent MRO
+        left, right = (cls, other) if not issubclass(other, cls) else (other, cls)
         return cast(
-            "Intersection[S, Q]", ShapeType(f"{cls.__name__}&{other.__name__}", (cls, other), {})
+            "Intersection[S, Q]", ShapeType(f"{left.__name__}&{right.__name__}", (left, right), {})
         )
 
 
