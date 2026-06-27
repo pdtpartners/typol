@@ -2089,6 +2089,26 @@ def duration[S: Shape](
     )
 
 
+# These overloads are to help `ty` resolve `S`, they shouldn't be necessary and should be removed
+# once `ty` gets better at these generics that aren't specified in all arguments
+@overload
+def date[S: Shape](
+    year: ExoExpr[S, int], month: int, day: int
+) -> Expr[S, Never, datetime.date]: ...
+@overload
+def date[S: Shape](
+    year: int, month: ExoExpr[S, int], day: int
+) -> Expr[S, Never, datetime.date]: ...
+@overload
+def date[S: Shape](
+    year: int, month: int, day: ExoExpr[S, int]
+) -> Expr[S, Never, datetime.date]: ...
+@overload
+def date[S: Shape](
+    year: int | ExoExpr[S, int], month: int | ExoExpr[S, int], day: int | ExoExpr[S, int]
+) -> Expr[S, Never, datetime.date]: ...
+
+
 def date[S: Shape](
     year: int | ExoExpr[S, int], month: int | ExoExpr[S, int], day: int | ExoExpr[S, int]
 ) -> Expr[S, Never, datetime.date]:

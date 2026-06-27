@@ -1,3 +1,4 @@
+import datetime
 import math
 from typing import TYPE_CHECKING, Final
 
@@ -24,7 +25,7 @@ class String(tp.Shape):
 
 class Person(tp.Shape):
     name = tp.dimension(str)
-    age = tp.dimension(int)
+    date_of_birth = tp.dimension(datetime.date)
 
 
 def _single_col_df[S: tp.Shape, T](
@@ -195,7 +196,7 @@ def test_intersections() -> None:
     assert (Person & String).shape_meta().schema == pl.Schema(
         {
             "name": pl.String,
-            "age": pl.Int64,
+            "date_of_birth": pl.Date,
             "value": pl.String,
         }
     )
@@ -203,7 +204,7 @@ def test_intersections() -> None:
         {
             "value": pl.String,
             "name": pl.String,
-            "age": pl.Int64,
+            "date_of_birth": pl.Date,
         }
     )
     # Conflicting columns
@@ -234,3 +235,28 @@ def test_intersections() -> None:
             "value2": pl.String,
         }
     )
+
+
+def test_date() -> None:
+    people = tp.DataFrame(
+        Person,
+        [
+            tp.Entry.of(
+                Person.name.set("William"),
+                Person.date_of_birth.set(datetime.date(1759, 8, 24)),
+            ),
+            tp.Entry.of(
+                Person.name.set("Douglas"),
+                Person.date_of_birth.set(datetime.date(1952, 3, 11)),
+            ),
+        ],
+    )
+    first_of_birth_year = tp.date(people.s.date_of_birth.dt.year(), 1, 1)
+    if TYPE_CHECKING:
+        static_assert(
+            is_equivalent_to(
+                TypeOf[first_of_birth_year], tp.ExoExpr[Person, datetime.date]
+            )
+        )
+    first_of_birth_year = people[first_of_birth_year].to_list()
+    assert first_of_birth_year == [datetime.date(1759, 1, 1), datetime.date(1952, 1, 1)]
