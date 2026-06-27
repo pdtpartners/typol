@@ -366,6 +366,10 @@ class DataFrame(Generic[_S_co]):
             .collect()
         )
 
+    def reverse(self) -> DataFrame[_S_co]:
+        """Reverse the dataframe order, so the first row is the last and so on"""
+        return DataFrame(self.shape, self.dataframe.reverse())
+
     def iter_raw(self) -> Iterator[tuple[Any, ...]]:
         """Yield each row of the frame as a tuple of values. Use `iter_rows` for well-typed access"""
         return self.dataframe.iter_rows(named=False)

@@ -412,6 +412,10 @@ class LazyFrame(Generic[_S_co]):
             ),
         )
 
+    def reverse(self) -> LazyFrame[_S_co]:
+        """Reverse the dataframe order, so the first row is the last and so on"""
+        return LazyFrame(self.shape, self.dataframe.reverse())
+
     def suffix(self, suffixed: type[Suffixed[_S_co]] | None = None) -> LazyFrame[Suffixed[_S_co]]:
         """
         Suffix the columns of the shape to distinguish them from conflicts with other shape column

@@ -500,15 +500,16 @@ def test_antijoin_df() -> None:
     ]
 
 
-def test_default_sort() -> None:
+@data_and_lazy
+def test_default_sort[F: _Frame](cls: F) -> None:
     """
     By default, sorting should be in order of definition, since this is well defined and controlled
     by the user in Typol
     """
-    people = tp.DataFrame(Person, _PEOPLE)
-    accounts = tp.DataFrame(Account, _ACCOUNTS)
+    people = cls(Person, _PEOPLE)
+    accounts = cls(Account, _ACCOUNTS)
     people = people.vstack(people.with_columns(people.s.age + 1))
-    assert people.sort().to_dicts() == [
+    assert people.sort().collect().to_dicts() == [
         {
             "name": "Douglas",
             "age": 42,
@@ -526,7 +527,7 @@ def test_default_sort() -> None:
             "age": 81,
         },
     ]
-    assert accounts.sort().to_dicts() == [
+    assert accounts.sort().collect().to_dicts() == [
         {
             "username": "douglas",
             "email": "douglas@adams.net",
@@ -536,7 +537,7 @@ def test_default_sort() -> None:
             "email": "will@wilberforce.net",
         },
     ]
-    assert people.sort(descending=True).to_dicts() == [
+    assert people.sort(descending=True).collect().to_dicts() == [
         {
             "name": "William",
             "age": 81,
@@ -554,7 +555,7 @@ def test_default_sort() -> None:
             "age": 42,
         },
     ]
-    assert accounts.sort(descending=True).to_dicts() == [
+    assert accounts.sort(descending=True).collect().to_dicts() == [
         {
             "username": "will",
             "email": "will@wilberforce.net",
@@ -563,6 +564,20 @@ def test_default_sort() -> None:
             "username": "douglas",
             "email": "douglas@adams.net",
         },
+    ]
+
+
+@data_and_lazy
+def test_reverse[F: _Frame](cls: F) -> None:
+    people = cls(Person, _PEOPLE)
+    accounts = cls(Account, _ACCOUNTS)
+    assert people.reverse().collect().to_dicts() == [
+        {"name": "William", "age": 80},
+        {"name": "Douglas", "age": 42},
+    ]
+    assert accounts.reverse().collect().to_dicts() == [
+        {"username": "will", "email": "will@wilberforce.net"},
+        {"username": "douglas", "email": "douglas@adams.net"},
     ]
 
 
