@@ -477,3 +477,24 @@ def test_concat_df() -> None:
             "age": 80,
         },
     ]
+
+
+def test_antijoin_df() -> None:
+    people = tp.DataFrame(Person, _PEOPLE)
+    accounts = tp.DataFrame(Account, _ACCOUNTS)
+    lowered_name = Person.name.str.to_lowercase()
+    anti_people = people.join(
+        accounts, lowered_name.on(accounts.s.username), how="anti"
+    )
+    anti_accounts = accounts.join(
+        people, accounts.s.username.on(lowered_name), how="anti"
+    )
+    assert anti_people.sort(Person.name).to_dicts() == [
+        {"name": "William", "age": 80},
+    ]
+    assert anti_accounts.sort(anti_accounts.s.username).to_dicts() == [
+        {
+            "username": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]

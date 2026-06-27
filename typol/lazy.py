@@ -17,6 +17,7 @@ from typing import (
     Unpack,
     assert_never,
     cast,
+    get_args,
     overload,
 )
 
@@ -610,6 +611,11 @@ class LazyFrame(Generic[_S_co]):
                 how=how,
                 **options,
             )
+            if how in get_args(JoinAgainstType):
+                # "anti" and "semi" joins just return the left shape, so do not need to be filled in
+                # nor any intersection constructed
+                return LazyFrame[_S_co](self.shape, joined)
+
             already_populated = frozenset(joined.collect_schema().keys())
             joined = joined.with_columns(
                 # Polars will drop right columns with different names if they're simple matchups
