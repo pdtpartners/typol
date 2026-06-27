@@ -89,6 +89,15 @@ def test_comparsions_as_operators() -> None:
     assert _INTS.filter(Int.value == 3).equals(_single_col_df(Int.value, 3))
     assert _INTS.filter(Int.value != 3).equals(_single_col_df(Int.value, 1, 5, 2, 4))
 
+    if TYPE_CHECKING:
+        # Make sure `ty` doesn't introduce `& Unknown when dealing with literals in comparisons
+        static_assert(is_equivalent_to(TypeOf[Int.value > 3], tp.ExoExpr[Int, bool]))
+        static_assert(is_equivalent_to(TypeOf[Int.value < 3], tp.ExoExpr[Int, bool]))
+        static_assert(is_equivalent_to(TypeOf[Int.value == 3], tp.ExoExpr[Int, bool]))
+        static_assert(is_equivalent_to(TypeOf[Int.value != 3], tp.ExoExpr[Int, bool]))
+        static_assert(is_equivalent_to(TypeOf[Int.value >= 3], tp.ExoExpr[Int, bool]))
+        static_assert(is_equivalent_to(TypeOf[Int.value <= 3], tp.ExoExpr[Int, bool]))
+
     assert _FLOATS.filter(Float.value > math.pi).equals(
         _single_col_df(Float.value, 4.8, 4.0)
     )

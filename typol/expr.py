@@ -898,30 +898,72 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         return IntermediateExpr(self.expr.ne(_pl_expr(other)))
 
+    @overload
+    def __gt__[SA: Shape](
+        self, other: ExoExpr[SA, _T]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def __gt__(self, other: _T) -> MesoExpr[_S_contra, bool]: ...
+
     def __gt__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
     ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         return self.gt(other)
+
+    @overload
+    def __lt__[SA: Shape](
+        self, other: ExoExpr[SA, _T]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def __lt__(self, other: _T) -> MesoExpr[_S_contra, bool]: ...
 
     def __lt__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
     ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         return self.lt(other)
 
+    @overload
+    def __ge__[SA: Shape](
+        self, other: ExoExpr[SA, _T]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def __ge__(self, other: _T) -> MesoExpr[_S_contra, bool]: ...
+
     def __ge__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
     ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         return self.ge(other)
+
+    @overload
+    def __le__[SA: Shape](
+        self, other: ExoExpr[SA, _T]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def __le__(self, other: _T) -> MesoExpr[_S_contra, bool]: ...
 
     def __le__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
     ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         return self.le(other)
 
+    @overload
+    def __ne__[SA: Shape](
+        self, other: ExoExpr[SA, _T]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def __ne__(self, other: _T) -> MesoExpr[_S_contra, bool]: ...
+
     def __ne__[SA: Shape](  # ty: ignore[invalid-method-override]
         self, other: ExoExpr[SA, _T] | _T
     ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         return self.ne(other)
+
+    @overload
+    def __eq__[SA: Shape](
+        self, other: ExoExpr[SA, _T]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def __eq__(self, other: _T) -> MesoExpr[_S_contra, bool]: ...
 
     def __eq__[SA: Shape](  # ty: ignore[invalid-method-override]
         self, other: ExoExpr[SA, _T] | _T
