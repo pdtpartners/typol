@@ -38,6 +38,7 @@ docs = [
     "mkdocs-material>=1.0",
     "mkdocs-nav-weight>=0.3.0",
     "pymdown-extensions>=1.0",
+    "griffelib<2.1",  # Newer griffelib doesn't work with current mkdocs
 ]
 dev = [
     {include-group = "test"},
