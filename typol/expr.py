@@ -7,7 +7,7 @@ import dataclasses
 import datetime
 import enum
 from abc import ABC
-from collections.abc import Callable, Collection, Iterable, Mapping, Sequence
+from collections.abc import Callable, Collection, Iterable, Iterator, Mapping, Sequence
 from decimal import Decimal
 from typing import (
     TYPE_CHECKING,
@@ -23,6 +23,7 @@ from typing import (
     TypeVar,
     Unpack,
     cast,
+    final,
     overload,
 )
 
@@ -2012,23 +2013,36 @@ def suffix[S: Shape](shape: type[S], suffix: str | None = None) -> type[Suffixed
     return SuffixedShape
 
 
-_SProjection_contra = TypeVar("_SProjection_contra", bound="Shape", contravariant=True)
+_P_invariant = TypeVar("_P_invariant", bound="Shape")
 
 
+@final
 @dataclasses.dataclass(frozen=True)
-class Projection(Generic[_SProjection_contra]):
+class Projection(Generic[_S_contra, _P_invariant]):
     """
-    Represent a projection of a potentially wider shape onto just this shape. This is useful for
-    constructing a struct out of a wider shape
+    Represent a projection of a potentially wider shape onto just a particular exact shape. This is
+    useful for constructing a struct out of a wider shape or joining on subshapes
     """
 
-    shape: type[_SProjection_contra]
+    shape: type[_P_invariant]
 
-    def struct(self) -> MesoExpr[_SProjection_contra, StructMapping[_SProjection_contra]]:
+    def struct(self) -> MesoExpr[_S_contra, StructMapping[_P_invariant]]:
         return IntermediateExpr(pl.struct(self.shape.shape_meta().datatypes.keys()))
 
+    def dimensions(self) -> Iterator[BoundDimension[_S_contra, Any]]:
+        # We know this cast is safe as the way to construct a projection with tp.projection means
+        # that `_S_contra` must be a subtype of `_P_invariant`
+        return cast(Iterator[BoundDimension[_S_contra, Any]], self.shape.shape_meta().dimensions)
 
-def projection[S: Shape](shape: type[S]) -> Projection[S]:
+    def on[Q: Shape](
+        self, other: Projection[Q, _P_invariant]
+    ) -> JoinOnGroup[_S_contra, Q] | JoinOnGroup[_S_contra, _S_contra]:
+        return JoinOnGroup(
+            tuple(d.on(other_d) for d, other_d in zip(self.dimensions(), other.dimensions()))
+        )
+
+
+def projection[S: Shape](shape: type[S]) -> Projection[S, S]:
     """
     Construct a projection of a shape out of a potentially wider shaped dataframe
 
@@ -2146,9 +2160,21 @@ def struct[S: Shape, M: Shape](*exprs: Expr[S, M, Any]) -> MesoExpr[S, StructMap
     return IntermediateExpr(pl.struct(map(_pl_expr, exprs)))
 
 
+@final
 @dataclasses.dataclass
 class JoinOn(Generic[_S_contra, _R_contra, _T]):
     """Represents a requirement for `left` and `right` to be equal for two rows to join"""
 
     left: ExoExpr[_S_contra, _T]
     right: ExoExpr[_R_contra, _T]
+
+
+@final
+@dataclasses.dataclass
+class JoinOnGroup(Generic[_S_contra, _R_contra]):
+    """
+    Represents a requirement for `left` and `right` to be equal on multiple expressions for two rows
+    to join
+    """
+
+    join_ons: Collection[JoinOn[_S_contra, _R_contra, Any]]

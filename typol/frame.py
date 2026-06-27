@@ -39,6 +39,8 @@ from typol.expr import (
     Explosion,
     Expr,
     JoinOn,
+    JoinOnGroup,
+    Projection,
     Shape,
     Suffixed,
 )
@@ -54,6 +56,9 @@ CsvQuoteStyle: TypeAlias = Literal["necessary", "always", "non_numeric", "never"
 JoinTogetherType: TypeAlias = Literal["inner", "left", "right", "full", "cross", "outer"]
 JoinAgainstType: TypeAlias = Literal["semi", "anti"]
 JoinType: TypeAlias = JoinTogetherType | JoinAgainstType
+type JoinOnable[S: Shape, Q: Shape] = (
+    ExoExpr[S | Q, Any] | JoinOn[S, Q, Any] | JoinOnGroup[S, Q] | Projection[S | Q, Any]
+)
 
 
 class JoinOptions(TypedDict, total=False):
@@ -654,7 +659,7 @@ class DataFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: DataFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinTogetherType = "inner",
         **options: Unpack[JoinOptions],
     ) -> DataFrame[Intersection[_S_co, Q]]: ...
@@ -662,7 +667,7 @@ class DataFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: DataFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinAgainstType,
         **options: Unpack[JoinOptions],
     ) -> DataFrame[_S_co]: ...
@@ -670,7 +675,7 @@ class DataFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: DataFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinType | Literal["anti"] = "inner",
         **options: Unpack[JoinOptions],
     ) -> DataFrame[Intersection[_S_co, Q]] | DataFrame[_S_co]:

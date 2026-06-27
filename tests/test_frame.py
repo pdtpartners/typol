@@ -653,3 +653,86 @@ def test_join_df_with_aliases() -> None:
             "email": "will@wilberforce.net",
         },
     ]
+
+
+def test_join_df_on_projection() -> None:
+    people = tp.DataFrame(Person, _PEOPLE)
+    accounts = tp.DataFrame(Account, _ACCOUNTS)
+    people = people.with_columns(
+        alias := people.s.name.str.to_lowercase().alias("matchable")
+    )
+    accounts = accounts.with_columns(
+        accounts.s.username.str.to_lowercase().alias("matchable")
+    )
+
+    matchable_shape = alias.construct_shape(people.dataframe)
+    matchable_projection = tp.projection(matchable_shape)
+
+    left = people.join(accounts, matchable_projection, how="left")
+    right = people.join(accounts, matchable_projection, how="right")
+    inner = people.join(accounts, matchable_projection, how="inner")
+    outer = people.join(accounts, matchable_projection, how="outer")
+    assert left.sort(Person.name).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "matchable": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": "William",
+            "age": 80,
+            "matchable": "william",
+            "username": None,
+            "email": None,
+        },
+    ]
+    assert right.sort(right.s.username).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "matchable": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "matchable": "will",
+            "email": "will@wilberforce.net",
+        },
+    ]
+    assert inner.to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "matchable": "douglas",
+            "email": "douglas@adams.net",
+        }
+    ]
+    assert outer.sort(Person.name, Account.username, nulls_last=True).to_dicts() == [
+        {
+            "name": "Douglas",
+            "age": 42,
+            "username": "douglas",
+            "matchable": "douglas",
+            "email": "douglas@adams.net",
+        },
+        {
+            "name": "William",
+            "age": 80,
+            "username": None,
+            "matchable": "william",
+            "email": None,
+        },
+        {
+            "name": None,
+            "age": None,
+            "username": "will",
+            "matchable": None,
+            "email": "will@wilberforce.net",
+        },
+    ]

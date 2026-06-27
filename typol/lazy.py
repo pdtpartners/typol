@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 import re
-from collections.abc import Callable, Collection, Iterable, Mapping, Sequence
+from collections.abc import Callable, Collection, Iterable, Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import (
     IO,
@@ -39,6 +39,8 @@ from typol.expr import (
     Explosion,
     Expr,
     JoinOn,
+    JoinOnGroup,
+    Projection,
     Shape,
     Suffixed,
     suffix,
@@ -46,6 +48,7 @@ from typol.expr import (
 from typol.frame import (
     DataFrame,
     JoinAgainstType,
+    JoinOnable,
     JoinOptions,
     JoinTogetherType,
     JoinType,
@@ -537,7 +540,7 @@ class LazyFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: LazyFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinTogetherType = "inner",
         **options: Unpack[JoinOptions],
     ) -> LazyFrame[Intersection[_S_co, Q]]: ...
@@ -545,7 +548,7 @@ class LazyFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: LazyFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinAgainstType,
         **options: Unpack[JoinOptions],
     ) -> LazyFrame[_S_co]: ...
@@ -553,7 +556,7 @@ class LazyFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: LazyFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinType = "inner",
         **options: Unpack[JoinOptions],
     ) -> LazyFrame[Intersection[_S_co, Q]] | LazyFrame[_S_co]: ...
@@ -561,7 +564,7 @@ class LazyFrame(Generic[_S_co]):
     def join[Q: Shape](
         self,
         right: LazyFrame[Q],
-        *on: ExoExpr[_S_co | Q, Any] | JoinOn[_S_co, Q, Any],
+        *on: JoinOnable[_S_co, Q],
         how: JoinType = "inner",
         **options: Unpack[JoinOptions],
     ) -> LazyFrame[Intersection[_S_co, Q]] | LazyFrame[_S_co]:
@@ -608,10 +611,11 @@ class LazyFrame(Generic[_S_co]):
             # Pre-1.24, Polars calls this column "join_nulls"
             options["join_nulls"] = jn  # ty: ignore[invalid-key]
         if on:
+            on = tuple(_normalize_join_onables(on))
             joined = self.dataframe.join(
                 right.dataframe,
-                left_on=[(e.left if isinstance(e, JoinOn) else e).expr for e in on],
-                right_on=[(e.right if isinstance(e, JoinOn) else e).expr for e in on],
+                left_on=[e.left.expr for e in on],
+                right_on=[e.right.expr for e in on],
                 how=how,
                 **options,
             )
@@ -735,3 +739,18 @@ class LazyGroupBy[S: Shape, Q: Shape]:
     def agg(self, *agg: AggExpr[S, Q, Any]) -> LazyFrame[Q]:
         """Define the aggregating expressions to group rows in the dataframe"""
         return LazyFrame(self.shape, self.group_by.agg(*(e.expr for e in agg)))
+
+
+def _normalize_join_onables[S: Shape, Q: Shape](
+    join_onables: Iterable[JoinOnable[S, Q]],
+) -> Iterator[JoinOn[S, Q, Any]]:
+    for item in join_onables:
+        match item:
+            case Projection():
+                yield from item.on(item).join_ons
+            case JoinOnGroup():
+                yield from item.join_ons
+            case JoinOn():
+                yield item
+            case expr:
+                yield expr.on(expr)
