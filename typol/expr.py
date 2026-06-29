@@ -1374,6 +1374,27 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         return IntermediateExpr(self.expr + _pl_expr(other))
 
     @overload
+    def __radd__[SA: Shape](
+        self, other: ExoExpr[SA, _T] | _T
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __radd__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __radd__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __radd__[SA: Shape, D: datetime.date | datetime.datetime](
+        self: Expr[_S_contra, _R_contra, D],
+        other: ExoExpr[SA, datetime.timedelta] | datetime.timedelta,
+    ) -> MesoExpr[Intersection[_S_contra, SA], D]: ...
+
+    def __radd__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(_pl_expr(other) + self.expr)
+
+    @overload
     def __sub__[SA: Shape](
         self: Expr[_S_contra, _R_contra, datetime.date | datetime.datetime],
         other: ExoExpr[SA, datetime.date | datetime.datetime] | datetime.date | datetime.datetime,
@@ -1400,6 +1421,32 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         return IntermediateExpr(self.expr - _pl_expr(other))
 
     @overload
+    def __rsub__[SA: Shape](
+        self: Expr[_S_contra, _R_contra, datetime.date | datetime.datetime],
+        other: ExoExpr[SA, datetime.date | datetime.datetime] | datetime.date | datetime.datetime,
+    ) -> MesoExpr[Intersection[_S_contra, SA], datetime.timedelta]: ...
+    @overload
+    def __rsub__[SA: Shape](
+        self, other: ExoExpr[SA, _T] | _T
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __rsub__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rsub__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __rsub__[SA: Shape, D: datetime.date | datetime.datetime](
+        self: Expr[_S_contra, _R_contra, D],
+        other: ExoExpr[SA, datetime.timedelta] | datetime.timedelta,
+    ) -> MesoExpr[Intersection[_S_contra, SA], D]: ...
+
+    def __rsub__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(_pl_expr(other) - self.expr)
+
+    @overload
     def __mul__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
@@ -1416,6 +1463,22 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         return IntermediateExpr(self.expr * _pl_expr(other))
 
     @overload
+    def __rmul__[SA: Shape](
+        self, other: ExoExpr[SA, _T] | _T
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __rmul__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rmul__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+
+    def __rmul__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(_pl_expr(other) * self.expr)
+
+    @overload
     def __pow__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
@@ -1430,6 +1493,22 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def __pow__(self, other: Expr | object) -> Expr:
         return IntermediateExpr(self.expr ** _pl_expr(other))
+
+    @overload
+    def __rpow__[SA: Shape](
+        self, other: ExoExpr[SA, _T] | _T
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __rpow__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rpow__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+
+    def __rpow__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(_pl_expr(other) ** self.expr)
 
     @overload
     def __truediv__[SA: Shape, N: float | Decimal](
@@ -1452,6 +1531,26 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         return IntermediateExpr(self.expr / _pl_expr(other))
 
     @overload
+    def __rtruediv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, N] | N
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rtruediv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rtruediv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __rtruediv__[SA: Shape](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, int] | int
+    ) -> MesoExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __rtruediv__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(_pl_expr(other) / self.expr)
+
+    @overload
     def __floordiv__[SA: Shape, N: float | Decimal](
         self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, N] | N
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
@@ -1470,6 +1569,26 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def __floordiv__(self, other: Expr | object) -> Expr:
         return IntermediateExpr(self.expr // _pl_expr(other))
+
+    @overload
+    def __rfloordiv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, N] | N
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rfloordiv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rfloordiv__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __rfloordiv__[SA: Shape](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, int] | int
+    ) -> MesoExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __rfloordiv__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(_pl_expr(other) / self.expr)
 
     def __neg__[N: (float, Decimal, datetime.timedelta, int)](
         self: Expr[_S_contra, _R_contra, N],

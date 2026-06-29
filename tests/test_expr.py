@@ -143,6 +143,20 @@ def test_arithmetic() -> None:
     )
 
 
+def test_rarithmetic() -> None:
+    assert _INTS.with_columns((5 + 2 * Int.value).to(Int.value)).equals(
+        _single_col_df(Int.value, 7, 15, 9, 13, 11)
+    )
+    assert _FLOATS.with_columns((2 / 2**Float.value).to(Float.value)).equals(
+        _single_col_df(
+            Float.value, 2 / 2**1.2, 2 / 2**4.8, 2 / 2**2.5, 0.125, 2 / 2**math.pi
+        )
+    )
+    assert _STRS.with_columns(("!" + String.value).to(String.value)).equals(
+        _single_col_df(String.value, "!spam", "!eggs", "!foo", "!bar")
+    )
+
+
 def test_lit() -> None:
     assert _INTS.with_columns((tp.lit(5) + Int.value * 2).to(Int.value)).equals(
         _single_col_df(Int.value, 7, 15, 9, 13, 11)
