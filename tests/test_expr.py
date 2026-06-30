@@ -283,3 +283,15 @@ def test_date() -> None:
         )
     first_of_birth_year = people[first_of_birth_year].to_list()
     assert first_of_birth_year == [datetime.date(1759, 1, 1), datetime.date(1952, 1, 1)]
+
+
+def test_agg_arithmetic() -> None:
+    # Older Polars versions don't allow these single-column aggregations since there's no key
+    if Version(pl.__version__) >= Version("1.40"):
+        assert _INTS.agg(Int.value.sum() * 2 + 5).equals(_single_col_df(Int.value, 35))
+        assert _FLOATS.agg(Float.value.sum() ** 2 / Float.value.sum()).equals(
+            _single_col_df(Float.value, 15.641592653589793)
+        )
+        assert _STRS.agg(String.value.str.join("") + "!").equals(
+            _single_col_df(String.value, "spameggsfoobar!")
+        )

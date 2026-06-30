@@ -253,7 +253,7 @@ type MesoAggExpr[S: Shape, T] = AggExpr[S, Never, T]
 
 
 @dataclasses.dataclass(frozen=True, eq=False)
-class AggExpr[S: Shape, R: Shape, T]:
+class AggExpr(Generic[_S_contra, _R_contra, _T]):
     """
     An expression created by an aggregation function (e.g. `.sum()`). This can't be used as a normal
     expression, only as an aggregated value in an `.agg(...)` argument
@@ -261,23 +261,25 @@ class AggExpr[S: Shape, R: Shape, T]:
 
     expr: pl.Expr
 
-    def coalesce(self, *others: ExoAggExpr[S, T]) -> AggExpr[S, R, T]:
+    def coalesce(self, *others: ExoAggExpr[_S_contra, _T]) -> AggExpr[_S_contra, _R_contra, _T]:
         return AggExpr(pl.coalesce(self.expr, *map(_pl_expr, others)))
 
-    def null_when_eq(self, value: ExoAggExpr[S, T] | T) -> AggExpr[S, R, T]:
+    def null_when_eq(
+        self, value: ExoAggExpr[_S_contra, _T] | _T
+    ) -> AggExpr[_S_contra, _R_contra, _T]:
         return AggExpr(pl.when(self.expr.ne(_pl_expr(value))).then(self.expr))
 
-    def to[Q: Shape](self, dimension: BoundDimension[Q, T]) -> AggExpr[S, Q, T]:
+    def to[Q: Shape](self, dimension: BoundDimension[Q, _T]) -> AggExpr[_S_contra, Q, _T]:
         # We don't cast here in case it's an `agg`; Polars has weird casting behaviour with
         # this and there's no way to tell Polars is this to be aggregated
         return AggExpr(self.expr.alias(dimension.name))
 
     def over[Q: Shape](
         self,
-        *exprs: ExoExpr[S, Any] | ExoExpr[Q, Any],
-        order_by: Iterable[ExoExpr[S, Any] | ExoExpr[Q, Any]] | None = None,
+        *exprs: ExoExpr[_S_contra, Any] | ExoExpr[Q, Any],
+        order_by: Iterable[ExoExpr[_S_contra, Any] | ExoExpr[Q, Any]] | None = None,
         mapping_strategy: Literal["group_to_rows", "join", "explode"] = "group_to_rows",
-    ) -> Expr[Intersection[S, Q], R, T]:
+    ) -> Expr[Intersection[_S_contra, Q], _R_contra, _T]:
         """
         Restrict an aggregating expression to just a window (i.e. bucket) of values keyed on by
         `exprs`. "group_to_rows" matches values up to the current rows, "join" matches them back to
@@ -298,6 +300,263 @@ class AggExpr[S: Shape, R: Shape, T]:
                 mapping_strategy=mapping_strategy,
             )
         )
+
+    @overload
+    def __add__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __add__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __add__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __add__[SA: Shape, D: datetime.date | datetime.datetime](
+        self: AggExpr[_S_contra, _R_contra, D],
+        other: ExoAggExpr[SA, datetime.timedelta] | datetime.timedelta,
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], D]: ...
+
+    def __add__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr + _pl_expr(other))
+
+    @overload
+    def __radd__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __radd__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __radd__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __radd__[SA: Shape, D: datetime.date | datetime.datetime](
+        self: AggExpr[_S_contra, _R_contra, D],
+        other: ExoAggExpr[SA, datetime.timedelta] | datetime.timedelta,
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], D]: ...
+
+    def __radd__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(_pl_expr(other) + self.expr)
+
+    @overload
+    def __sub__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, datetime.date | datetime.datetime],
+        other: ExoAggExpr[SA, datetime.date | datetime.datetime]
+        | datetime.date
+        | datetime.datetime,
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], datetime.timedelta]: ...
+    @overload
+    def __sub__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __sub__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __sub__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __sub__[SA: Shape, D: datetime.date | datetime.datetime](
+        self: AggExpr[_S_contra, _R_contra, D],
+        other: ExoAggExpr[SA, datetime.timedelta] | datetime.timedelta,
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], D]: ...
+
+    def __sub__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr - _pl_expr(other))
+
+    @overload
+    def __rsub__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, datetime.date | datetime.datetime],
+        other: ExoAggExpr[SA, datetime.date | datetime.datetime]
+        | datetime.date
+        | datetime.datetime,
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], datetime.timedelta]: ...
+    @overload
+    def __rsub__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __rsub__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rsub__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __rsub__[SA: Shape, D: datetime.date | datetime.datetime](
+        self: AggExpr[_S_contra, _R_contra, D],
+        other: ExoAggExpr[SA, datetime.timedelta] | datetime.timedelta,
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], D]: ...
+
+    def __rsub__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(_pl_expr(other) - self.expr)
+
+    @overload
+    def __mul__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __mul__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __mul__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+
+    def __mul__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr * _pl_expr(other))
+
+    @overload
+    def __rmul__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __rmul__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rmul__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+
+    def __rmul__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(_pl_expr(other) * self.expr)
+
+    @overload
+    def __pow__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __pow__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __pow__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+
+    def __pow__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr ** _pl_expr(other))
+
+    @overload
+    def __rpow__[SA: Shape](
+        self, other: ExoAggExpr[SA, _T] | _T
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def __rpow__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rpow__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+
+    def __rpow__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(_pl_expr(other) ** self.expr)
+
+    @overload
+    def __truediv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, N] | N
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __truediv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __truediv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __truediv__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, int] | int
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __truediv__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr / _pl_expr(other))
+
+    @overload
+    def __rtruediv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, N] | N
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rtruediv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rtruediv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __rtruediv__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, int] | int
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __rtruediv__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(_pl_expr(other) / self.expr)
+
+    @overload
+    def __floordiv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, N] | N
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __floordiv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __floordiv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __floordiv__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, int] | int
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __floordiv__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr // _pl_expr(other))
+
+    @overload
+    def __rfloordiv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, N] | N
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rfloordiv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __rfloordiv__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __rfloordiv__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, int] | int
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __rfloordiv__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(_pl_expr(other) / self.expr)
+
+    def __neg__[N: (float, Decimal, datetime.timedelta, int)](
+        self: AggExpr[_S_contra, _R_contra, N],
+    ) -> AggExpr[_S_contra, _R_contra, N]:
+        return AggExpr(-self.expr)
+
+    def __invert__(
+        self: AggExpr[_S_contra, _R_contra, bool],
+    ) -> AggExpr[_S_contra, _R_contra, bool]:
+        return AggExpr(~self.expr)
+
+    def abs[N: float | Decimal | int](
+        self: AggExpr[_S_contra, _R_contra, N],
+    ) -> AggExpr[_S_contra, _R_contra, N]:
+        return AggExpr(self.expr.abs())
 
 
 class _StrSplitOptions(TypedDict, total=False):
