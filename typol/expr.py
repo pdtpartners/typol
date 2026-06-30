@@ -973,6 +973,18 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def __hash__[SA: Shape](self) -> int:
         return hash(self.expr)
 
+    @overload
+    def is_between[SA: Shape](
+        self,
+        start: ExoExpr[SA, _T] | _T,
+        end: ExoExpr[SA, _T] | _T,
+        closed: Literal["both", "left", "right", "none"] = "both",
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def is_between(
+        self, start: _T, end: _T, closed: Literal["both", "left", "right", "none"] = "both"
+    ) -> MesoExpr[_S_contra, bool]: ...
+
     def is_between[SA: Shape](
         self,
         start: ExoExpr[SA, _T] | _T,
@@ -1024,9 +1036,16 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def not_(self: Expr[_S_contra, _R_contra, bool]) -> Expr[_S_contra, _R_contra, bool]:
         return IntermediateExpr(self.expr.not_())
 
+    @overload
+    def is_in[SA: Shape](
+        self, other: ExoExpr[SA, builtins.list[_T]]
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]: ...
+    @overload
+    def is_in(self, other: Collection[_T] | Series[_T]) -> MesoExpr[_S_contra, bool]: ...
+
     def is_in[SA: Shape](
         self, other: ExoExpr[SA, builtins.list[_T]] | Collection[_T] | Series[_T]
-    ) -> MesoExpr[_S_contra, bool]:
+    ) -> MesoExpr[Intersection[_S_contra, SA], bool]:
         match other:
             case Series():
                 return IntermediateExpr(self.expr.is_in(other.data))
