@@ -180,6 +180,12 @@ def test_when() -> None:
                 TypeOf[over_three_divide_by_two_otherwise_add_one], tp.DataFrame[Int]
             )
         )
+        static_assert(
+            is_equivalent_to(
+                TypeOf[tp.when(Int.value > 3).then(Int.value).otherwise(-Int.value)],
+                tp.EndoExpr[Int, int],
+            )
+        )
     # Use a column name to make sure it doesn't pick that up
     assert _STRS.with_columns(
         tp.when(String.value.str.len_chars().gt(3)).then(String.value)

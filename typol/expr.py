@@ -2185,6 +2185,13 @@ class PartialConditional(Expr[_S_contra, _R_contra, _T]):
     ) -> ChainedWhen[Intersection[_S_contra, SA], _R_contra, _T]:
         return ChainedWhen(self.expr.when(c.expr for c in conditions))
 
+    @overload
+    def otherwise[SA: Shape](
+        self, otherwise: ExoExpr[SA, _T]
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
+    @overload
+    def otherwise(self, otherwise: _T) -> Expr[_S_contra, _R_contra, _T]: ...
+
     def otherwise[SA: Shape](
         self, otherwise: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]:
