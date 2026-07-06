@@ -157,6 +157,15 @@ def test_rarithmetic() -> None:
     )
 
 
+def test_abs() -> None:
+    assert _INTS.with_columns((2 - Int.value).to(Int.value).abs()).equals(
+        _single_col_df(Int.value, 1, 3, 0, 2, 1)
+    )
+    assert _INTS.with_columns(abs(2 - Int.value).to(Int.value)).equals(
+        _single_col_df(Int.value, 1, 3, 0, 2, 1)
+    )
+
+
 def test_lit() -> None:
     assert _INTS.with_columns((tp.lit(5) + Int.value * 2).to(Int.value)).equals(
         _single_col_df(Int.value, 7, 15, 9, 13, 11)

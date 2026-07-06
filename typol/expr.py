@@ -1880,7 +1880,7 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def __rfloordiv__(self, other: Expr | object) -> Expr:
         return IntermediateExpr(_pl_expr(other) / self.expr)
 
-    def __neg__[N: (float, Decimal, datetime.timedelta, int)](
+    def __neg__[N: (int, float, Decimal, datetime.timedelta)](
         self: Expr[_S_contra, _R_contra, N],
     ) -> Expr[_S_contra, _R_contra, N]:
         return IntermediateExpr(-self.expr)
@@ -1888,7 +1888,12 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def __invert__(self: Expr[_S_contra, _R_contra, bool]) -> Expr[_S_contra, _R_contra, bool]:
         return IntermediateExpr(~self.expr)
 
-    def abs[N: float | Decimal | int](
+    def __abs__[N: (int, float, Decimal, datetime.timedelta)](
+        self: Expr[_S_contra, _R_contra, N],
+    ) -> Expr[_S_contra, _R_contra, N]:
+        return self.abs()
+
+    def abs[N: (int, float, Decimal, datetime.timedelta)](
         self: Expr[_S_contra, _R_contra, N],
     ) -> Expr[_S_contra, _R_contra, N]:
         return IntermediateExpr(self.expr.abs())
