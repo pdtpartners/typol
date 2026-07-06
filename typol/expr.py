@@ -571,6 +571,13 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
 
     expr: Expr[S, R, T]
 
+    @overload
+    def contains[Q: Shape](
+        self, substring: ExoExpr[Q, str], literal: bool = False
+    ) -> MesoExpr[Intersection[S, Q], bool]: ...
+    @overload
+    def contains(self, substring: str, literal: bool = False) -> MesoExpr[S, bool]: ...
+
     def contains[Q: Shape](
         self, substring: ExoExpr[Q, str] | str, literal: bool = False
     ) -> MesoExpr[Intersection[S, Q], bool]:
@@ -578,9 +585,9 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
         substr = _pl_expr(substring)
         return IntermediateExpr(self.expr.expr.str.contains(substr, literal=literal))
 
-    def contains_any[Q: Shape](
+    def contains_any(
         self, substrings: Collection[str], *, ascii_case_insensitive: bool = False
-    ) -> MesoExpr[Intersection[S, Q], bool]:
+    ) -> MesoExpr[S, bool]:
         """
         Whether each column value contains the substring (or if `ascii_case_insensitive` is set, then
         the match can be either upper or lower case)
