@@ -1005,7 +1005,7 @@ class ListExprNamespace[S: Shape, R: Shape, T]:
         return IntermediateExpr(self.expr.expr.list.unique())
 
     def sort(self, descending: bool = False) -> Expr[S, R, list[T]]:
-        """Order the eleements of the list"""
+        """Order the elements of the list"""
         return IntermediateExpr(self.expr.expr.list.sort(descending=descending))
 
     def explode(self) -> MesoExpr[S, T]:
@@ -1411,6 +1411,11 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def sort(self, *, descending: bool = False) -> Expr[_S_contra, _R_contra, _T]:
         return IntermediateExpr(self.expr.sort(descending=descending))
+
+    def sort_by(
+        self, *by: ExoExpr[_S_contra, Any], descending: bool = False
+    ) -> Expr[_S_contra, _R_contra, _T]:
+        return IntermediateExpr(self.expr.sort_by(*map(_pl_expr, by), descending=descending))
 
     def first(self) -> AggExpr[_S_contra, _R_contra, _T]:
         return AggExpr(self.expr.first())

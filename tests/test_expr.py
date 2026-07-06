@@ -301,3 +301,10 @@ def test_agg_arithmetic() -> None:
         assert _STRS.agg(String.value.str.join("") + "!").equals(
             _single_col_df(String.value, "spameggsfoobar!")
         )
+
+
+def test_sort() -> None:
+    assert _INTS[_INTS.s.value.sort()].to_list() == [1, 2, 3, 4, 5]
+    assert _INTS[
+        _INTS.s.value.sort_by((_INTS.s.value - 3).abs(), _INTS.s.value > 3)
+    ].to_list() == [3, 2, 4, 1, 5]
