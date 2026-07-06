@@ -219,6 +219,12 @@ def test_str_functions() -> None:
             ["f", "", ""],
             ["b", "r"],
         ]
+    assert _STRS[_STRS.s.value.str.extract("(.[oa].)")].to_list() == [
+        "pam",
+        None,
+        "foo",
+        "bar",
+    ]
 
 
 def test_intersections() -> None:

@@ -616,7 +616,7 @@ class StrExprNamespace[S: Shape, R: Shape, T]:
 
     def extract[Q: Shape](
         self, pattern: ExoExpr[Q, str] | str, group_index: int = 1
-    ) -> EndoExpr[Intersection[S, Q], bool]:
+    ) -> EndoExpr[Intersection[S, Q], str]:
         """Extract the 1st or `group_index`th regex capture group from the column"""
         return IntermediateExpr(self.expr.expr.str.extract(_pl_expr(pattern), group_index))
 
