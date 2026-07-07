@@ -8,7 +8,13 @@ from typol.expr import Expr
 from typol.types import EnumOf
 
 if TYPE_CHECKING:
-    from ty_extensions import Intersection, TypeOf, is_assignable_to, static_assert
+    from ty_extensions import (
+        Intersection,
+        TypeOf,
+        is_assignable_to,
+        is_equivalent_to,
+        static_assert,
+    )
 
 type _Frame[S: tp.Shape] = type[tp.DataFrame[S] | tp.LazyFrame[S]]
 
@@ -736,3 +742,33 @@ def test_join_df_on_projection() -> None:
             "email": "will@wilberforce.net",
         },
     ]
+
+
+@data_and_lazy
+def test_with_row_index[F: _Frame](cls: F) -> None:
+    frame: tp.DataFrame[Person] | tp.LazyFrame[Person] = cls(Person, _PEOPLE)
+    indexed = frame.with_row_index().collect()
+    assert indexed.to_dicts() == [
+        {"name": "Douglas", "age": 42, "index": 0},
+        {"name": "William", "age": 80, "index": 1},
+    ]
+    assert indexed[indexed.s.index].to_list() == [0, 1]
+    if TYPE_CHECKING:
+        static_assert(
+            is_equivalent_to(TypeOf[indexed[indexed.s.index]], tp.Series[int])
+        )
+
+
+@data_and_lazy
+def test_with_custom_row_index[F: _Frame](cls: F) -> None:
+    frame: tp.DataFrame[Person] | tp.LazyFrame[Person] = cls(Person, _PEOPLE)
+    positioned = frame.with_row_index("position", 1).collect()
+    assert positioned.to_dicts() == [
+        {"name": "Douglas", "age": 42, "position": 1},
+        {"name": "William", "age": 80, "position": 2},
+    ]
+    assert positioned[positioned.s.position].to_list() == [1, 2]
+    if TYPE_CHECKING:
+        static_assert(
+            is_equivalent_to(TypeOf[positioned[positioned.s.position]], tp.Series[int])
+        )

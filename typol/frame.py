@@ -788,6 +788,20 @@ class DataFrame(Generic[_S_co]):
         """Get the first `n` rows, alias for [head][typol.lazy.LazyFrame.head]"""
         return self.head(n)
 
+    @overload
+    def with_row_index(
+        self, /, offset: int = ...
+    ) -> DataFrame[Intersection[_S_co, AliasShape[Literal["index"], int]]]: ...
+    @overload
+    def with_row_index[A: LiteralString](
+        self, name: A, offset: int = ...
+    ) -> DataFrame[Intersection[_S_co, AliasShape[A, int]]]: ...
+
+    def with_row_index(
+        self, name: LiteralString = "index", offset: int = 0
+    ) -> DataFrame[Intersection[_S_co, AliasShape[LiteralString, int]]]:
+        return self.lazy().with_row_index(name, offset).collect()
+
 
 @overload
 def enforce_shape[S: Shape](shape: type[S], dataframe: pl.DataFrame) -> pl.DataFrame: ...

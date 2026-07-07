@@ -178,11 +178,20 @@ class Dimension[T]:
             object.__setattr__(self, "name", name)
 
 
-class AliasShape[A: str, T](Shape):
+class AliasShape[A: LiteralString, T](Shape):
     if TYPE_CHECKING:
 
         def __getattr__(self, name: A, /) -> BoundDimension[Self, T]:
             raise NotImplementedError
+
+    @staticmethod
+    def of[S: LiteralString, U](name: S, type: Typeable[U]) -> type[AliasShape[S, U]]:
+        class _AliasShape(AliasShape): ...
+
+        ty = from_typeable(type)
+        setattr(_AliasShape, name, Dimension(ty, name))
+        _AliasShape.__name__ = f"AliasShape[Literal[{name!r}], {ty}]"
+        return _AliasShape
 
 
 _A = TypeVar("_A", bound=LiteralString)
@@ -193,7 +202,7 @@ _T = TypeVar("_T")
 
 @dataclasses.dataclass(frozen=True)
 class Alias(Generic[_S_contra, _A, _T]):
-    name: str
+    name: _A
     source_expr: ExoExpr[_S_contra, _T]
 
     def construct_shape(
@@ -205,12 +214,9 @@ class Alias(Generic[_S_contra, _A, _T]):
             # Legacy compatible way of retrieving the alias's dtype
             assert isinstance(context, (pl.DataFrame, pl.LazyFrame))
             pl_ty = context.select(self.expr).collect_schema().dtypes()[0]
-        ty = Type(pl_ty.to_python(), pl_ty)
+        ty = Type(cast(type[_T], pl_ty.to_python()), pl_ty)
 
-        class _AliasShape(AliasShape): ...
-
-        setattr(_AliasShape, self.name, Dimension(ty, self.name))
-        return _AliasShape
+        return AliasShape.of(self.name, ty)
 
     @property
     def expr(self) -> pl.Expr:
