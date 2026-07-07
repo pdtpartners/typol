@@ -8,7 +8,7 @@ from packaging.version import Version
 import polars as pl
 
 if TYPE_CHECKING:
-    from ty_extensions import TypeOf, is_equivalent_to, static_assert
+    from ty_extensions import TypeOf, is_assignable_to, is_equivalent_to, static_assert
 
 
 class Int(tp.Shape):
@@ -304,6 +304,48 @@ def test_date() -> None:
         )
     first_of_birth_year = people[first_of_birth_year].to_list()
     assert first_of_birth_year == [datetime.date(1759, 1, 1), datetime.date(1952, 1, 1)]
+
+
+def test_date_arithmetic() -> None:
+    people = tp.DataFrame(
+        Person,
+        [
+            tp.Entry.of(
+                Person.name.set("William"),
+                Person.date_of_birth.set(datetime.date(1759, 8, 24)),
+            ),
+            tp.Entry.of(
+                Person.name.set("Douglas"),
+                Person.date_of_birth.set(datetime.date(1952, 3, 11)),
+            ),
+        ],
+    )
+
+    assert people[people.s.date_of_birth + datetime.timedelta(days=30)].to_list() == [
+        datetime.date(1759, 9, 23),
+        datetime.date(1952, 4, 10),
+    ]
+    if TYPE_CHECKING:
+        # You shouldn't be able to subtract a date from a timedelta, only the other way round
+        datetime.timedelta(days=30) - people.s.date_of_birth  # ty: ignore[unsupported-operator]
+        static_assert(
+            is_assignable_to(
+                tp.EndoExpr[Person, datetime.date],
+                TypeOf[people.s.date_of_birth - datetime.timedelta(days=30)],
+            )
+        )
+    with_turns_ten_on = people.with_columns(
+        (
+            tp.date(
+                people.s.date_of_birth.dt.year() + 10,
+                people.s.date_of_birth.dt.month(),
+                people.s.date_of_birth.dt.day(),
+            ).alias("turns_ten_on")
+        )
+    )
+    assert with_turns_ten_on[
+        with_turns_ten_on.s.turns_ten_on - people.s.date_of_birth
+    ].to_list() == [datetime.timedelta(days=3653), datetime.timedelta(days=3652)]
 
 
 def test_agg_arithmetic() -> None:
