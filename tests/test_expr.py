@@ -365,3 +365,20 @@ def test_sort() -> None:
     assert _INTS[
         _INTS.s.value.sort_by((_INTS.s.value - 3).abs(), _INTS.s.value > 3)
     ].to_list() == [3, 2, 4, 1, 5]
+
+
+def test_coalesce() -> None:
+    assert _INTS[_INTS.s.value.null_when(_INTS.s.value > 3).coalesce(3)].to_list() == [
+        1,
+        3,
+        2,
+        3,
+        3,
+    ]
+    if TYPE_CHECKING:
+        static_assert(
+            is_equivalent_to(
+                TypeOf[_INTS.s.value.null_when(_INTS.s.value > 3).coalesce(3)],
+                tp.EndoExpr[Int, int],
+            )
+        )

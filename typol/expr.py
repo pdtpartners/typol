@@ -1289,6 +1289,8 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
         self, fill: ExoExpr[SA, _T] | _T
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
     @overload
+    def fill_null(self, fill: _T) -> Expr[_S_contra, _R_contra, _T]: ...
+    @overload
     def fill_null[SA: Shape](
         self, *, strategy: Literal["forward", "backward", "min", "max", "mean", "zero", "one"]
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
@@ -1806,6 +1808,17 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def is_unique(self) -> MesoExpr[_S_contra, bool]:
         return IntermediateExpr(self.expr.is_unique())
+
+    @overload
+    def coalesce(self, *others: _T) -> Expr[_S_contra, _R_contra, _T]: ...
+    @overload
+    def coalesce[SA: Shape](
+        self,
+        *others: ExoExpr[_S_contra, _T]
+        | ExoExpr[SA, _T]
+        | ExoExpr[Intersection[_S_contra, SA], _T]
+        | _T,
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, _T]: ...
 
     def coalesce[SA: Shape](
         self,
