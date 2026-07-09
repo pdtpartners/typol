@@ -4314,8 +4314,8 @@ the type parameter along</p>
 </span><span id="__span-0-2029"><a id="__codelineno-0-2029" name="__codelineno-0-2029"></a><span class="sd">        &quot;&quot;&quot;</span>
 </span><span id="__span-0-2030"><a id="__codelineno-0-2030" name="__codelineno-0-2030"></a>        <span class="k">return</span> <span class="n">IntermediateExpr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="o">.</span><span class="n">map_elements</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">return_dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ty</span><span class="o">.</span><span class="n">pl_ty</span><span class="p">))</span>
 </span><span id="__span-0-2031"><a id="__codelineno-0-2031" name="__codelineno-0-2031"></a>
-</span><span id="__span-0-2032"><a id="__codelineno-0-2032" name="__codelineno-0-2032"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">null</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_S_contra</span><span class="p">,</span> <span class="n">_T</span><span class="p">]:</span>
-</span><span id="__span-0-2033"><a id="__codelineno-0-2033" name="__codelineno-0-2033"></a>        <span class="n">null</span><span class="p">:</span> <span class="n">MesoExpr</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">lit</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="__span-0-2032"><a id="__codelineno-0-2032" name="__codelineno-0-2032"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">null</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="n">_S_contra</span><span class="p">,</span> <span class="n">_T</span><span class="p">]:</span>
+</span><span id="__span-0-2033"><a id="__codelineno-0-2033" name="__codelineno-0-2033"></a>        <span class="n">null</span><span class="p">:</span> <span class="n">MesoExpr</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="n">_T</span><span class="p">]</span> <span class="o">=</span> <span class="n">lit</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 </span><span id="__span-0-2034"><a id="__codelineno-0-2034" name="__codelineno-0-2034"></a>        <span class="k">return</span> <span class="n">null</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </span></code></pre></div></td></tr></table></div>
               </details>
@@ -4395,7 +4395,7 @@ rather than on <code>Expr</code>, to know the polars datatype of the output. To 
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="Expr (typol.expr.Expr)" href="#typol.expr.Expr">Expr</a>[<span title="typing.Any">Any</span>, <span title="typol.expr.BoundSeries[S]">S</span>, <span title="typol.expr.BoundSeries[T]">T</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="Expr (typol.expr.Expr)" href="#typol.expr.Expr">Expr</a>[<a class="autorefs autorefs-internal" title="Shape (typol.expr.Shape)" href="#typol.expr.Shape">Shape</a>, <span title="typol.expr.BoundSeries[S]">S</span>, <span title="typol.expr.BoundSeries[T]">T</span>]</code></p>
 
 
 
@@ -4415,7 +4415,7 @@ rather than on <code>Expr</code>, to know the polars datatype of the output. To 
 <span class="normal"><a href="#__codelineno-0-2039">2039</a></span>
 <span class="normal"><a href="#__codelineno-0-2040">2040</a></span>
 <span class="normal"><a href="#__codelineno-0-2041">2041</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2037"><a id="__codelineno-0-2037" name="__codelineno-0-2037"></a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="__span-0-2038"><a id="__codelineno-0-2038" name="__codelineno-0-2038"></a><span class="k">class</span><span class="w"> </span><span class="nc">BoundSeries</span><span class="p">[</span><span class="n">S</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">T</span><span class="p">](</span><span class="n">Expr</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
+</span><span id="__span-0-2038"><a id="__codelineno-0-2038" name="__codelineno-0-2038"></a><span class="k">class</span><span class="w"> </span><span class="nc">BoundSeries</span><span class="p">[</span><span class="n">S</span><span class="p">:</span> <span class="n">Shape</span><span class="p">,</span> <span class="n">T</span><span class="p">](</span><span class="n">Expr</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">]):</span>
 </span><span id="__span-0-2039"><a id="__codelineno-0-2039" name="__codelineno-0-2039"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;A series bound to a name that can be inserted into shape `S`&quot;&quot;&quot;</span>
 </span><span id="__span-0-2040"><a id="__codelineno-0-2040" name="__codelineno-0-2040"></a>
 </span><span id="__span-0-2041"><a id="__codelineno-0-2041" name="__codelineno-0-2041"></a>    <span class="n">expr</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Series</span>
@@ -8629,7 +8629,7 @@ column name, so is most useful with <code>transform_write_csv</code></p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="Expr (typol.expr.Expr)" href="#typol.expr.Expr">Expr</a>[<span title="typing.Any">Any</span>, <span title="typol.expr._S_contra">_S_contra</span>, <span title="typol.expr._T">_T</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="Expr (typol.expr.Expr)" href="#typol.expr.Expr">Expr</a>[<a class="autorefs autorefs-internal" title="Shape (typol.expr.Shape)" href="#typol.expr.Shape">Shape</a>, <span title="typol.expr._S_contra">_S_contra</span>, <span title="typol.expr._T">_T</span>]</code></p>
 
 
 
@@ -8658,7 +8658,7 @@ value</p>
 <span class="normal"><a href="#__codelineno-0-2054">2054</a></span>
 <span class="normal"><a href="#__codelineno-0-2055">2055</a></span>
 <span class="normal"><a href="#__codelineno-0-2056">2056</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2044"><a id="__codelineno-0-2044" name="__codelineno-0-2044"></a><span class="nd">@dataclasses</span><span class="o">.</span><span class="n">dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-</span><span id="__span-0-2045"><a id="__codelineno-0-2045" name="__codelineno-0-2045"></a><span class="k">class</span><span class="w"> </span><span class="nc">Initializer</span><span class="p">(</span><span class="n">Expr</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">_S_contra</span><span class="p">,</span> <span class="n">_T</span><span class="p">]):</span>
+</span><span id="__span-0-2045"><a id="__codelineno-0-2045" name="__codelineno-0-2045"></a><span class="k">class</span><span class="w"> </span><span class="nc">Initializer</span><span class="p">(</span><span class="n">Expr</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="n">_S_contra</span><span class="p">,</span> <span class="n">_T</span><span class="p">]):</span>
 </span><span id="__span-0-2046"><a id="__codelineno-0-2046" name="__codelineno-0-2046"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="__span-0-2047"><a id="__codelineno-0-2047" name="__codelineno-0-2047"></a><span class="sd">    Used in `Entry.of` to allow constructing rows where the dimension matches the assigned column</span>
 </span><span id="__span-0-2048"><a id="__codelineno-0-2048" name="__codelineno-0-2048"></a><span class="sd">    value</span>
@@ -12800,7 +12800,7 @@ conflicts with the len builtin</p>
 <span class="normal"><a href="#__codelineno-0-2212">2212</a></span>
 <span class="normal"><a href="#__codelineno-0-2213">2213</a></span>
 <span class="normal"><a href="#__codelineno-0-2214">2214</a></span>
-<span class="normal"><a href="#__codelineno-0-2215">2215</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2210"><a id="__codelineno-0-2210" name="__codelineno-0-2210"></a><span class="k">def</span><span class="w"> </span><span class="nf">length</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MesoAggExpr</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-2215">2215</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2210"><a id="__codelineno-0-2210" name="__codelineno-0-2210"></a><span class="k">def</span><span class="w"> </span><span class="nf">length</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MesoAggExpr</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 </span><span id="__span-0-2211"><a id="__codelineno-0-2211" name="__codelineno-0-2211"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="__span-0-2212"><a id="__codelineno-0-2212" name="__codelineno-0-2212"></a><span class="sd">    Count the number of rows in a shape or window. This is namespaced under `Expr` to avoid</span>
 </span><span id="__span-0-2213"><a id="__codelineno-0-2213" name="__codelineno-0-2213"></a><span class="sd">    conflicts with the len builtin</span>
@@ -13030,7 +13030,7 @@ conflicts with the len builtin</p>
 <span class="normal"><a href="#__codelineno-0-2239">2239</a></span>
 <span class="normal"><a href="#__codelineno-0-2240">2240</a></span>
 <span class="normal"><a href="#__codelineno-0-2241">2241</a></span>
-<span class="normal"><a href="#__codelineno-0-2242">2242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2230"><a id="__codelineno-0-2230" name="__codelineno-0-2230"></a><span class="k">def</span><span class="w"> </span><span class="nf">row_index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MesoExpr</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="normal"><a href="#__codelineno-0-2242">2242</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-0-2230"><a id="__codelineno-0-2230" name="__codelineno-0-2230"></a><span class="k">def</span><span class="w"> </span><span class="nf">row_index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MesoExpr</span><span class="p">[</span><span class="n">Shape</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 </span><span id="__span-0-2231"><a id="__codelineno-0-2231" name="__codelineno-0-2231"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="__span-0-2232"><a id="__codelineno-0-2232" name="__codelineno-0-2232"></a><span class="sd">    Row number of the current line of the frame or window, starting at 0</span>
 </span><span id="__span-0-2233"><a id="__codelineno-0-2233" name="__codelineno-0-2233"></a>
