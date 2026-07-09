@@ -2029,20 +2029,20 @@ class BoundDimension(Expr[_S_contra, _S_contra, _T]):
         """
         return IntermediateExpr(self.expr.map_elements(transform, return_dtype=self.ty.pl_ty))
 
-    def null(self) -> Expr[Any, _S_contra, _T]:
-        null: MesoExpr[Any, _T] = lit(None)
+    def null(self) -> Expr[Shape, _S_contra, _T]:
+        null: MesoExpr[Shape, _T] = lit(None)
         return null.to(self)
 
 
 @dataclasses.dataclass(frozen=True, eq=False)
-class BoundSeries[S: Shape, T](Expr[Any, S, T]):
+class BoundSeries[S: Shape, T](Expr[Shape, S, T]):
     """A series bound to a name that can be inserted into shape `S`"""
 
     expr: pl.Series
 
 
 @dataclasses.dataclass(frozen=True, eq=False)
-class Initializer(Expr[Any, _S_contra, _T]):
+class Initializer(Expr[Shape, _S_contra, _T]):
     """
     Used in `Entry.of` to allow constructing rows where the dimension matches the assigned column
     value
@@ -2207,7 +2207,7 @@ def max_horizontal[S: Shape, R: Shape, T: Orderable](
     )
 
 
-def length() -> MesoAggExpr[Any, int]:
+def length() -> MesoAggExpr[Shape, int]:
     """
     Count the number of rows in a shape or window. This is namespaced under `Expr` to avoid
     conflicts with the len builtin
@@ -2227,7 +2227,7 @@ def int_range[S: Shape, Q: Shape](
     return IntermediateExpr(pl.int_range(_pl_expr(value), _pl_expr_or_none(end), step))
 
 
-def row_index() -> MesoExpr[Any, int]:
+def row_index() -> MesoExpr[Shape, int]:
     """
     Row number of the current line of the frame or window, starting at 0
 

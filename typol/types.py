@@ -130,7 +130,7 @@ class DecimalType(Type[Decimal]):
 
     pl_ty: pl.Decimal
 
-    def __call__(self, value: Decimal | int) -> Expr[Any, NoShape, Decimal]:
+    def __call__(self, value: Decimal | int) -> Expr[Shape, NoShape, Decimal]:
         """
         Create a literal value cast into this type, i.e. `decimal(38, 8)(5)` will be a `pl.Decimal`
 
