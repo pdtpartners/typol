@@ -396,3 +396,23 @@ def test_shape_with_columns() -> None:
                 tp.WithColumn[Int, Literal["other"], str],
             )
         )
+
+
+def test_xor() -> None:
+    assert _INTS.with_columns(Int.value ^ -1)[Int.value].to_list() == [
+        -2,
+        -6,
+        -3,
+        -5,
+        -4,
+    ]
+    # Test boolean operation
+    assert _INTS[Int.value < 3].to_list() == [True, False, True, False, False]
+    assert _INTS[(Int.value % 2) == 1].to_list() == [True, True, False, False, True]
+    assert _INTS[((Int.value % 2) == 1) ^ (Int.value < 3)].to_list() == [
+        False,
+        True,
+        True,
+        False,
+        True,
+    ]

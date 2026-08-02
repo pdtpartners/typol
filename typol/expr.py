@@ -509,7 +509,32 @@ class AggExpr(Generic[_S_contra, _R_contra, _T]):
     def __rfloordiv__[SA: Shape, N: (float, Decimal, int)](
         self: AggExpr[_S_contra, _R_contra, N] | AggExpr[_S_contra, _R_contra, int], other: N | int
     ) -> MesoAggExpr[Intersection[_S_contra, SA], N]:
-        return AggExpr(_pl_expr(other) / self.expr)
+        return AggExpr(_pl_expr(other) // self.expr)
+
+    @overload
+    def __mod__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, N] | N
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __mod__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, N], other: ExoAggExpr[SA, int] | int
+    ) -> AggExpr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __mod__[SA: Shape, N: float | Decimal](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, N] | N
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __mod__[SA: Shape](
+        self: AggExpr[_S_contra, _R_contra, int], other: ExoAggExpr[SA, int] | int
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], float]: ...  # Ints give floats when divided
+
+    def __mod__(self, other: AggExpr | object) -> AggExpr:
+        return AggExpr(self.expr % _pl_expr(other))
+
+    def __rmod__[SA: Shape, N: (float, Decimal, int)](
+        self: AggExpr[_S_contra, _R_contra, N] | AggExpr[_S_contra, _R_contra, int], other: N | int
+    ) -> MesoAggExpr[Intersection[_S_contra, SA], N]:
+        return AggExpr(_pl_expr(other) % self.expr)
 
     def __neg__[N: (float, Decimal, datetime.timedelta, int)](
         self: AggExpr[_S_contra, _R_contra, N],
@@ -1612,6 +1637,16 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     ) -> Expr[Intersection[_S_contra, SA], _R_contra, bool]:
         return IntermediateExpr(self.expr & _pl_expr(other))
 
+    def __xor__[SA: Shape, T: (bool, int)](
+        self: Expr[_S_contra, _R_contra, T], other: ExoExpr[SA, T] | T
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, T]:
+        return IntermediateExpr(self.expr ^ _pl_expr(other))
+
+    def __rxor__[SA: Shape, T: (bool, int)](
+        self: Expr[_S_contra, _R_contra, T], other: T
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, T]:
+        return IntermediateExpr(_pl_expr(other) ^ self.expr)
+
     @overload
     def __add__[SA: Shape](
         self, other: ExoExpr[SA, _T] | _T
@@ -1794,7 +1829,32 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
     def __rfloordiv__[N: (float, Decimal, int)](
         self: Expr[_S_contra, _R_contra, N] | Expr[_S_contra, _R_contra, int], other: N | int
     ) -> MesoExpr[_S_contra, N]:
-        return IntermediateExpr(_pl_expr(other) / self.expr)
+        return IntermediateExpr(_pl_expr(other) // self.expr)
+
+    @overload
+    def __mod__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, N] | N
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __mod__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, N], other: ExoExpr[SA, int] | int
+    ) -> Expr[Intersection[_S_contra, SA], _R_contra, N]: ...
+    @overload
+    def __mod__[SA: Shape, N: float | Decimal](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, N] | N
+    ) -> MesoExpr[Intersection[_S_contra, SA], N]: ...
+    @overload
+    def __mod__[SA: Shape](
+        self: Expr[_S_contra, _R_contra, int], other: ExoExpr[SA, int] | int
+    ) -> MesoExpr[Intersection[_S_contra, SA], int]: ...
+
+    def __mod__(self, other: Expr | object) -> Expr:
+        return IntermediateExpr(self.expr % _pl_expr(other))
+
+    def __rmod__[N: (float, Decimal, int)](
+        self: Expr[_S_contra, _R_contra, N] | Expr[_S_contra, _R_contra, int], other: N | int
+    ) -> MesoExpr[_S_contra, N]:
+        return IntermediateExpr(_pl_expr(other) % self.expr)
 
     def __neg__[N: (int, float, Decimal, datetime.timedelta)](
         self: Expr[_S_contra, _R_contra, N],
