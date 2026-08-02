@@ -1511,7 +1511,7 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def replace(
         self,
-        mapping: Mapping[_T, _T],
+        mapping: Mapping[_T, _T | None],
         *,
         default: ExoExpr[_S_contra, _T] | _T | None = None,
         or_null: bool = False,
@@ -1532,7 +1532,7 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def replace_to[Q: Shape, U](
         self,
-        mapping: Mapping[_T, U],
+        mapping: Mapping[_T, U | None],
         to: BoundDimension[Q, U],
         *,
         default: ExoExpr[_S_contra, U] | U | None = None,
@@ -1560,7 +1560,7 @@ class Expr(ABC, Generic[_S_contra, _R_contra, _T]):
 
     def replace_out[U](
         self,
-        mapping: Mapping[_T, U],
+        mapping: Mapping[_T, U | None],
         ty: Typeable[U],
         *,
         default: ExoExpr[_S_contra, U] | U | None = None,
