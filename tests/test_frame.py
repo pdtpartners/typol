@@ -381,7 +381,8 @@ def test_alias() -> None:
         tp.when(df.s.age < 30)
         .then(Suit.SPADES)
         .otherwise(Suit.CLUBS)
-        .alias("assigned_suit")
+        .alias("assigned_suit"),
+        df.s.name.str.head(3).alias("nickname"),
     )
     assert df3[df3.s.assigned_suit].to_list() == [
         "spades",
@@ -391,14 +392,16 @@ def test_alias() -> None:
         "clubs",
         "clubs",
     ]
+    assert df3[df3.s.nickname].to_list() == ["Ali", "Bob", "Cha", "Dav", "Eve", "Fre"]
     if TYPE_CHECKING:
         static_assert(
-            is_assignable_to(
+            is_equivalent_to(
                 TypeOf[df3],
                 tp.LazyFrame[
                     Intersection[
                         Person,
                         tp.expr.AliasShape[Literal["assigned_suit"], Suit],
+                        tp.expr.AliasShape[Literal["nickname"], str],
                     ]
                 ],
             )
