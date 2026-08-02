@@ -103,6 +103,9 @@ class ShapeMeta[S: Shape]:
                 yield value
 
 
+type WithColumn[S, A: LiteralString, T] = Intersection[type[S], type[AliasShape[A, T]]]
+
+
 class ShapeType(type):
     """Metaclass defining shape-level operators"""
 
@@ -110,6 +113,11 @@ class ShapeType(type):
         cls: type[S], other: type[Q]
     ) -> Intersection[type[S], type[Q]]:
         return cls & other
+
+    def with_column[S: Shape, A: LiteralString, T](
+        cls: type[S], name: A, type: Typeable[T]
+    ) -> WithColumn[S, A, T]:
+        return cls & AliasShape.of(name, type)
 
     def __and__[S: Shape, Q: Shape](cls: type[S], other: type[Q]) -> Intersection[type[S], type[Q]]:
         if cls is other:

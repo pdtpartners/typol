@@ -1,6 +1,6 @@
 import datetime
 import math
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, Final, Literal
 
 import typol as tp
 from packaging.version import Version
@@ -380,5 +380,19 @@ def test_coalesce() -> None:
             is_equivalent_to(
                 TypeOf[_INTS.s.value.null_when(_INTS.s.value > 3).coalesce(3)],
                 tp.EndoExpr[Int, int],
+            )
+        )
+
+
+def test_shape_with_columns() -> None:
+    assert Int.with_column("other", str).shape_meta().datatypes == {
+        "value": pl.Int64,
+        "other": pl.String,
+    }
+    if TYPE_CHECKING:
+        static_assert(
+            is_equivalent_to(
+                TypeOf[Int.with_column("other", str)],
+                tp.WithColumn[Int, Literal["other"], str],
             )
         )
