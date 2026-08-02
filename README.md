@@ -22,6 +22,7 @@ class Account(tp.Shape):
     account_age = tp.dimension(datetime.timedelta)
     uid = tp.dimension(int)
 
+
 accounts = tp.DataFrame(Account, [...])  # type: tp.DataFrame[Account]
 ```
 
@@ -48,6 +49,7 @@ You can create new dataframes with these transformations:
 class Contact(tp.Shape):
     uid = tp.dimension(int)
     email = tp.dimension(str)
+
 
 accounts.transform(Contact, email_address.to(Contact.email))
 ```
@@ -84,7 +86,7 @@ If you change type, it won't be assignable to the same column:
 
 ```python
 # `.uid.cast_out(str)` can't be left in `.uid` if cast to a str
-# Argument to bound method `DataFrame.with_columns` is incorrect: 
+# Argument to bound method `DataFrame.with_columns` is incorrect:
 #  Expected `Expr[Account, Account, _] | BoundSeries[Account, _]`, found `Expr[Account, Never, str]`
 accounts.with_columns(accounts.s.uid.cast_out(str))
 ```
@@ -92,7 +94,7 @@ accounts.with_columns(accounts.s.uid.cast_out(str))
 so you have to assign it using `.to` to one that makes sense:
 
 ```python
-# This works fine, because `str`s make sense for `.name` 
+# This works fine, because `str`s make sense for `.name`
 accounts.with_columns(accounts.s.uid.cast_out(str).to(accounts.s.name))
 ```
 Need to filter out only interesting rows? No problem:
@@ -182,6 +184,7 @@ Ty supports intersection types that makes writing joins a lot less involved, it 
 ```python
 import typol as tp
 
+
 class Account(tp.Shape):
     name = tp.dimension(str)
     website = tp.dimension(str)
@@ -193,6 +196,7 @@ class Contact(tp.Shape):
     email = tp.dimension(str)
     known_since = tp.dimension(tp.UINT_16)
     phone = tp.dimension(str)
+
 
 # Let's say I have some account data
 accounts = tp.DataFrame(Account, ...)
@@ -218,28 +222,31 @@ emails = contacts[Contact.email].to_list()
 reveal_type(emails)  # list[str], Contact.known_since would reveal to `list[int]`
 print("All emails found:", emails)
 
+
 class PhoneAddress(tp.Shape):
     number = tp.dimension(str)
     street = tp.dimension(str)
+
 
 # We have some data about the street addresses of phone lines
 phone_addresses = tp.DataFrame(PhoneAddress, ...)
 
 # Now lets join our contacts with the phone address data to work out what home addresses we already know
-full_details = contacts.join(
-    phone_addresses,
-    contacts.s.phone.on(phone_addresses.s.number)
-)
+full_details = contacts.join(phone_addresses, contacts.s.phone.on(phone_addresses.s.number))
 reveal_type(full_details)  # tp.DataFrame[Contact & PhoneAddress]
 
 reveal_type(full_details.s.street.is_null())  # Expr[PhoneAddress, _, bool]
 
 # We still need to ask some of our friends for their home address so we can send out RSVPs
-still_need_to_ask_for_address = full_details.filter(full_details.s.street.is_null())[full_details.s.email]
+still_need_to_ask_for_address = full_details.filter(full_details.s.street.is_null())[
+    full_details.s.email
+]
 reveal_type(still_need_to_ask_for_address)  # tp.Series[str]
 
 # Send out an email asking if they can let us know where to send the RSVPs
-send_email(still_need_to_ask_for_address.to_list(), "Send me your mailing address for birthday RSVPs!")
+send_email(
+    still_need_to_ask_for_address.to_list(), "Send me your mailing address for birthday RSVPs!"
+)
 ```
 
 More examples and snippets are available [in the `tests`](./tests)

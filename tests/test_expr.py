@@ -4,11 +4,13 @@ from typing import TYPE_CHECKING, Final, Literal
 
 import typol as tp
 from packaging.version import Version
+from typol.expr import AliasShape
 
 import polars as pl
 
 if TYPE_CHECKING:
-    from ty_extensions import TypeOf, is_assignable_to, is_equivalent_to, static_assert
+    from ty_extensions import Intersection, static_assert
+    from ty_extensions._internal import TypeOf, is_assignable_to, is_equivalent_to
 
 
 class Int(tp.Shape):
@@ -335,13 +337,11 @@ def test_date_arithmetic() -> None:
             )
         )
     with_turns_ten_on = people.with_columns(
-        (
-            tp.date(
-                people.s.date_of_birth.dt.year() + 10,
-                people.s.date_of_birth.dt.month(),
-                people.s.date_of_birth.dt.day(),
-            ).alias("turns_ten_on")
-        )
+        tp.date(
+            people.s.date_of_birth.dt.year() + 10,
+            people.s.date_of_birth.dt.month(),
+            people.s.date_of_birth.dt.day(),
+        ).alias("turns_ten_on")
     )
     assert with_turns_ten_on[
         with_turns_ten_on.s.turns_ten_on - people.s.date_of_birth
@@ -393,7 +393,7 @@ def test_shape_with_columns() -> None:
         static_assert(
             is_equivalent_to(
                 TypeOf[Int.with_column("other", str)],
-                tp.WithColumn[Int, Literal["other"], str],
+                Intersection[type[Int], type[AliasShape[Literal["other"], str]]],
             )
         )
 

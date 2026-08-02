@@ -147,9 +147,6 @@ def decimal(precision: int | None = None, scale: int = 0) -> DecimalType:
 
 @runtime_checkable
 class _EnumTypeConnection[T](Protocol):
-    @property
-    def value(self) -> T: ...
-
     def __init__(self, value: T, /) -> Self: ...
 
 

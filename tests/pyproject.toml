@@ -1,3 +1,6 @@
 [tool.ruff]
 
-lint.ignore = ["PLR2004"]
+lint.ignore = [
+    "PLR2004",
+    "DTZ001", # call-datetime-without-tzinfo, not necessary for example datetimes
+]

@@ -2,9 +2,9 @@ import datetime
 from decimal import Decimal
 from pathlib import Path
 
-import polars as pl
-
 import typol as tp
+
+import polars as pl
 from tests.examples.postage.store import (
     ClientRateQuery,
     CustomerRelationship,

@@ -494,9 +494,9 @@ def test_literal_series() -> None:
         ),
         out.dataframe,
         **(  # ty: ignore[invalid-argument-type]
-            dict(atol=0.00001)
+            {"atol": 0.00001}
             if Version(pl.__version__) < Version("1.32.3")
-            else dict(abs_tol=0.00001)
+            else {"abs_tol": 0.00001}
         ),
     )
 

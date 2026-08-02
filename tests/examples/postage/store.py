@@ -5,12 +5,9 @@ import datetime
 from abc import ABC, abstractmethod
 from collections.abc import Collection
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import typol as tp
-
-if TYPE_CHECKING:
-    pass
 
 
 class CustomerRelationship(Enum):
@@ -159,7 +156,7 @@ class PostageRateStore(ABC):
         schedule = schedule.explode(
             _explode_nulls_over(
                 schedule.s.relationship,
-                CustomerRelationship,
+                frozenset(CustomerRelationship),
                 schedule.s.destination,
                 schedule.s.origin,
                 schedule.s.end,

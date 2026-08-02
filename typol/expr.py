@@ -103,7 +103,7 @@ class ShapeMeta[S: Shape]:
                 yield value
 
 
-type WithColumn[S, A: LiteralString, T] = Intersection[type[S], type[AliasShape[A, T]]]
+type WithColumn[S, A: LiteralString, T] = Intersection[S, AliasShape[A, T]]
 
 
 class ShapeType(type):
@@ -116,7 +116,7 @@ class ShapeType(type):
 
     def with_column[S: Shape, A: LiteralString, T](
         cls: type[S], name: A, type: Typeable[T]
-    ) -> WithColumn[S, A, T]:
+    ) -> Intersection[type[S], type[AliasShape[A, T]]]:
         return cls & AliasShape.of(name, type)
 
     def __and__[S: Shape, Q: Shape](cls: type[S], other: type[Q]) -> Intersection[type[S], type[Q]]:
@@ -125,7 +125,8 @@ class ShapeType(type):
         # Switch the order if other <: cls, to avoid inconsistent MRO
         left, right = (cls, other) if not issubclass(other, cls) else (other, cls)
         return cast(
-            "Intersection[S, Q]", ShapeType(f"{left.__name__}&{right.__name__}", (left, right), {})
+            "Intersection[type[S], type[Q]]",
+            ShapeType(f"{left.__name__}&{right.__name__}", (left, right), {}),
         )
 
 
@@ -2402,7 +2403,7 @@ class Suffixed[S: Shape](Shape):
 
     @classmethod
     def __call__[T](cls, dim: BoundDimension[S, T]) -> BoundDimension[Self, T]:
-        return cls.__new__(dim)  # ty: ignore[missing-argument]
+        return cls.__new__(dim)  # ty: ignore[missing-argument,invalid-argument-type]
 
     @classmethod
     def shape_meta(cls) -> ShapeMeta:

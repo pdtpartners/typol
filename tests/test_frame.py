@@ -10,11 +10,9 @@ from typol.types import EnumOf
 if TYPE_CHECKING:
     from ty_extensions import (
         Intersection,
-        TypeOf,
-        is_assignable_to,
-        is_equivalent_to,
         static_assert,
     )
+    from ty_extensions._internal import TypeOf, is_assignable_to, is_equivalent_to
 
 type _Frame[S: tp.Shape] = type[tp.DataFrame[S] | tp.LazyFrame[S]]
 

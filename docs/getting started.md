@@ -15,6 +15,7 @@ Before you can operate on your data, you'll need to declare what it looks like. 
 ```py
 import typol as tp
 
+
 class Purchase(tp.Shape):
     customer = tp.dimension(str)
     product = tp.dimension(str)
@@ -45,8 +46,10 @@ class Customer(tp.Shape):
     phone = tp.dimension(int)
     state = tp.dimension(str)
 
+
 # You can use `&` to quickly combine shapes
 CustomerPurchase = Customer & Purchase
+
 
 # Or you can use multiple inheritence and add more fields at the same time
 class FullPurchaseInfo(Customer, Purchase):
@@ -81,7 +84,7 @@ purchases = tp.DataFrame(
             Customer.state.set(r.state_code),
         )
         for r in db_results
-    )
+    ),
 )
 ```
 
@@ -137,7 +140,7 @@ customers.with_columns(customers.s.phone.cast_out(str).to(customers.s.name))
 customers.with_columns(
     # Even though this is string to string, it uses a list in the middle so loses its column, so we
     # need to map it back with `.to(customer.s.name)`
-    customers.s.name.str.split(" ").list.join("_").to(customer.s.name),
+    customers.s.name.str.split(" ").list.join("_").to(customer.s.name)
 )
 ```
 
@@ -153,7 +156,9 @@ customers.with_columns(customers.s.phone.cast_out(str))
 Filtering is pretty simple, you just need to create a boolean expression:
 
 ```py
-customers.filter(customers.s.age >= 20, customers.s.state != "NY" | customers.s.name.str.starts_with("J"))
+customers.filter(
+    customers.s.age >= 20, customers.s.state != "NY" | customers.s.name.str.starts_with("J")
+)
 ```
 
 #### Adding or removing columns
@@ -164,12 +169,13 @@ You'll often want to define a shape with extra columns to expand your dataframes
 class PurchaseAtStore(Purchase):
     location: tp.dimension(str)
 
+
 purchases = purchases.transform(
-    PurchaseAtStore, 
+    PurchaseAtStore,
     tp.when(purchases.s.product.str.contains("Ice Cream"))
     .then("Beach")
     .otherwise("Downtown")
-    .to(PurchaseAtStore.location)
+    .to(PurchaseAtStore.location),
 )
 ```
 
@@ -190,9 +196,7 @@ Most commonly, you'll need to add or remove columns when joining data. This will
 
 ```py
 customer_purchases = purchases.join(
-    customers,
-    purchases.s.customer.on(customers.s.name),
-    how="left",
+    customers, purchases.s.customer.on(customers.s.name), how="left"
 )
 ```
 
@@ -225,8 +229,7 @@ total_purchases = purchases.agg(
 
 # If you just want to group by a particular column, you can specify it explicitly
 spend_per_customer = purchases.group_by(Purchase.customer).agg(
-    (Purchase.price * Purchase.quantity).sum(),
-    Purchase.quantity.sum(),
+    (Purchase.price * Purchase.quantity).sum(), Purchase.quantity.sum()
 )
 ```
 
@@ -238,7 +241,9 @@ spend_per_customer = purchases.group_by(Purchase.customer).agg(
 ```py
 insert_into_db(
     CustomerObj(
-        name=row[Customer.name],  # Each of these is correctly typed as `str` or `int`, so is type checked
+        name=row[
+            Customer.name
+        ],  # Each of these is correctly typed as `str` or `int`, so is type checked
         age=row[Customer.age],
         state=row[Customer.state],
     )
@@ -355,10 +360,12 @@ customers.select(pl.col.name, pl.col.age)
 customers.select(pl.col.str.strip_chars(), pl.col.age + 1)
 customers.with_columns(pl.col.str.strip_chars(), pl.col.age + 1)
 
+
 # Typol
 class Person(tp.Shape):
     name = tp.dimension(str)
     age = tp.dimension(int)
+
 
 # Typol will always select all available columns
 customers.transform(Person)
@@ -376,10 +383,9 @@ class AgesOfNames(tp.Shape):
     ages = tp.dimension(tp.list_of(str))
 
 
-name_stats = people.group_by_transform(
-    AgesOfNames, 
-    people.s.name.to(AgesOfNames.name)
-).agg(people.s.ages.agg().to(AgesOfNames.ages))
+name_stats = people.group_by_transform(AgesOfNames, people.s.name.to(AgesOfNames.name)).agg(
+    people.s.ages.agg().to(AgesOfNames.ages)
+)
 ```
 
 This avoids having to have awkward states, i.e. using strings to represent lists or singleton lists before aggregation, and can avoid having more intermediate shapes
