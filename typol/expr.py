@@ -2089,7 +2089,7 @@ class BoundDimension(Expr[_S_contra, _S_contra, _T]):
     def set_or_null_all(self, values: Iterable[_T | None]) -> ColumnInitializer[_S_contra, _T]:
         return ColumnInitializer(self, list(map(normalize_enum, values)))
 
-    def map(self, transform: Callable[[_T], _T]) -> EndoExpr[_S_contra, _T]:
+    def map(self, transform: Callable[[_T], _T | None]) -> EndoExpr[_S_contra, _T]:
         """
         Apply a Python transformation to the values in a column. This is defined on the dimension
         rather than on `Expr`, to know the polars datatype of the output. To change the type, use
