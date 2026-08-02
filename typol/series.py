@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 from collections.abc import Iterable, Iterator
+from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 import polars as pl
@@ -47,7 +48,7 @@ class Series[T]:
     def count(self) -> int:
         return self.data.count()
 
-    def sum[N: (int, float)](self: Series[N]) -> N:
+    def sum[N: (int, float, Decimal)](self: Series[N]) -> N:
         return cast(N, self.data.sum())
 
     @overload
@@ -169,7 +170,7 @@ class LazySeries[T]:
     def count(self) -> int:
         return _collect_val(self.data.count()) or 0
 
-    def sum[N: (int, float)](self: LazySeries[N]) -> N:
+    def sum[N: (int, float, Decimal)](self: LazySeries[N]) -> N | Literal[0]:
         return _collect_val(self.data.sum()) or 0
 
     def max(self) -> T | None:
